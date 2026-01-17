@@ -5,6 +5,8 @@
 - `frontend/src/models/occasion.ts` - Define `Occasion` model shape.
 - `frontend/src/models/difficulty.ts` - Define `Difficulty` model shape.
 - `frontend/src/models/alcoholLevel.ts` - Define `AlcoholLevel` model shape.
+- `frontend/src/models/filterTypes.ts` - Shared filter input types for multi/single select fields.
+- `frontend/src/models/index.ts` - Barrel exports for model types and filter inputs.
 - `frontend/src/data/seedData.ts` - Seed data for all domain models.
 - `frontend/src/utils/filterCocktails.ts` - Pure filtering helpers for basic filters.
 - `frontend/src/utils/filterCocktails.test.ts` - Unit tests for filtering helpers.
@@ -17,11 +19,11 @@
 
 ## Tasks
 
-- [ ] 1.0 Define domain model types for cocktails and filters
-  - [ ] 1.1 Create model folders/files for `Cocktail`, `Vibe`, `Occasion`, `Difficulty`, and `AlcoholLevel`
-  - [ ] 1.2 Define TypeScript types/interfaces with required fields and optional fields
-  - [ ] 1.3 Add shared types/enums for filter inputs (multi-select vibes/occasions, single difficulty/alcohol)
-  - [ ] 1.4 Export model types from a single index barrel
+- [x] 1.0 Define domain model types for cocktails and filters
+  - [x] 1.1 Create model folders/files for `Cocktail`, `Vibe`, `Occasion`, `Difficulty`, and `AlcoholLevel`
+  - [x] 1.2 Define TypeScript types/interfaces with required fields and optional fields
+  - [x] 1.3 Add shared types/enums for filter inputs (multi-select vibes/occasions, single difficulty/alcohol)
+  - [x] 1.4 Export model types from a single index barrel
 - [ ] 2.0 Create seed data for vibes, occasions, difficulty, alcohol levels, and cocktails
   - [ ] 2.1 Define seed lists for `Vibe`, `Occasion`, `Difficulty`, and `AlcoholLevel` with stable IDs
   - [ ] 2.2 Create a small `Cocktail` seed set with correct foreign keys (difficulty/alcohol) and arrays (vibes/occasions)

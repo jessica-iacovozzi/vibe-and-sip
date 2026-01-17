@@ -1,0 +1,10 @@
+export type MultiSelectIds = string[];
+
+export type SingleSelectId = string;
+
+export type FilterInput = {
+  vibeIds?: MultiSelectIds;
+  occasionIds?: MultiSelectIds;
+  difficultyId?: SingleSelectId;
+  alcoholLevelId?: SingleSelectId;
+};
