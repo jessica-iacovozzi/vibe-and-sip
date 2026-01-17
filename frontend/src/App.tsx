@@ -1,10 +1,7 @@
+import AppLayout from "./components/AppLayout";
+
 function App() {
-  return (
-    <main>
-      <h1>Vibe &amp; Sip</h1>
-      <p>Welcome! This is the starter shell for the MVP flow.</p>
-    </main>
-  );
+  return <AppLayout />;
 }
 
 export default App;
