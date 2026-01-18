@@ -1,6 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { alcoholLevels, cocktails, difficulties, occasions, vibes } from '../data';
+import { alcoholLevels, cocktails, difficulties, occasions, vibes } from '../domain';
 
 type StringCheck = {
   value: unknown;

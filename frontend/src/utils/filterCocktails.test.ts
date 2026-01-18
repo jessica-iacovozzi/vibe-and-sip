@@ -1,7 +1,6 @@
 import { describe, expect, it } from 'vitest';
 
-import { cocktails } from '../data';
-import filterCocktails from './filterCocktails';
+import { cocktails, filterCocktails } from '../domain';
 
 const getIds = (items: Array<{ id: string }>): string[] => items.map((item) => item.id).sort();
 

@@ -14,6 +14,7 @@
 - `frontend/src/models/models.test.ts` - Unit tests for model shape consistency.
 - `frontend/package.json` - Adds the Vitest test script and dependency.
 - `frontend/.eslintrc.cjs` - Allow dev dependency imports in test files.
+- `frontend/src/domain/index.ts` - Single export surface for domain data, models, and utilities.
 
 ### Notes
 
@@ -42,6 +43,6 @@
   - [x] 4.2 Add tests for filtering by difficulty only, alcohol only, vibes only, occasions only
   - [x] 4.3 Add tests for combined filters (vibes + occasions + difficulty + alcohol)
   - [x] 4.4 Add tests for empty filters returning all cocktails
-- [ ] 5.0 Add a single export surface for models, seed data, and filtering helpers
-  - [ ] 5.1 Create `frontend/src/domain/index.ts` (or similar) to export models, data, and utilities
-  - [ ] 5.2 Update imports in tests to use the new export surface
+- [x] 5.0 Add a single export surface for models, seed data, and filtering helpers
+  - [x] 5.1 Create `frontend/src/domain/index.ts` (or similar) to export models, data, and utilities
+  - [x] 5.2 Update imports in tests to use the new export surface
