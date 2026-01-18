@@ -12,11 +12,13 @@
 - `frontend/src/utils/filterCocktails.ts` - Pure filtering helpers for basic filters.
 - `frontend/src/utils/filterCocktails.test.ts` - Unit tests for filtering helpers.
 - `frontend/src/models/models.test.ts` - Unit tests for model shape consistency.
+- `frontend/package.json` - Adds the Vitest test script and dependency.
+- `frontend/.eslintrc.cjs` - Allow dev dependency imports in test files.
 
 ### Notes
 
 - Unit tests should typically be placed alongside the code files they are testing (e.g., `MyComponent.tsx` and `MyComponent.test.tsx` in the same directory).
-- Use `npx jest [optional/path/to/test/file]` to run tests. Running without a path executes all tests found by the Jest configuration.
+- Use `npm run test` to run Vitest-based unit tests.
 
 ## Tasks
 
@@ -30,16 +32,16 @@
   - [x] 2.2 Create a small `Cocktail` seed set with correct foreign keys (difficulty/alcohol) and arrays (vibes/occasions)
   - [x] 2.3 Validate that IDs referenced in cocktails exist in the seed lists
   - [x] 2.4 Export seed data from a single index barrel
-- [ ] 3.0 Implement pure filtering utilities for basic filter combinations
+- [x] 3.0 Implement pure filtering utilities for basic filter combinations
   - [x] 3.1 Define a `FilterCriteria` type with optional difficulty/alcohol and multi-select arrays
   - [x] 3.2 Implement `filterCocktails` as a pure function using early returns and array helpers
   - [x] 3.3 Ensure filtering supports single difficulty/alcohol and multi-select vibes/occasions
   - [x] 3.4 Add a small helper to normalize empty/undefined filter inputs
-- [ ] 4.0 Add unit tests for model shapes and filtering behavior
-  - [ ] 4.1 Add tests that validate each model has required fields
-  - [ ] 4.2 Add tests for filtering by difficulty only, alcohol only, vibes only, occasions only
-  - [ ] 4.3 Add tests for combined filters (vibes + occasions + difficulty + alcohol)
-  - [ ] 4.4 Add tests for empty filters returning all cocktails
+- [x] 4.0 Add unit tests for model shapes and filtering behavior
+  - [x] 4.1 Add tests that validate each model has required fields
+  - [x] 4.2 Add tests for filtering by difficulty only, alcohol only, vibes only, occasions only
+  - [x] 4.3 Add tests for combined filters (vibes + occasions + difficulty + alcohol)
+  - [x] 4.4 Add tests for empty filters returning all cocktails
 - [ ] 5.0 Add a single export surface for models, seed data, and filtering helpers
   - [ ] 5.1 Create `frontend/src/domain/index.ts` (or similar) to export models, data, and utilities
   - [ ] 5.2 Update imports in tests to use the new export surface

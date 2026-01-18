@@ -5,4 +5,4 @@ export {
   occasions,
   validateSeedData,
   vibes,
-} from "./seedData";
+} from './seedData';

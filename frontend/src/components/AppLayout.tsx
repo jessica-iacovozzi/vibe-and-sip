@@ -16,38 +16,38 @@ type SessionDetail = {
 };
 
 const navItems: NavItem[] = [
-  { label: "Discover", helper: "Mood & guests", isActive: true },
-  { label: "Plan", helper: "Experience", isActive: false },
-  { label: "Reserve", helper: "Inventory", isActive: false },
-  { label: "Confirm", helper: "Checkout", isActive: false },
+  { label: 'Discover', helper: 'Mood & guests', isActive: true },
+  { label: 'Plan', helper: 'Experience', isActive: false },
+  { label: 'Reserve', helper: 'Inventory', isActive: false },
+  { label: 'Confirm', helper: 'Checkout', isActive: false },
 ];
 
 const flowSteps: FlowStep[] = [
   {
-    title: "Define the vibe",
-    description: "Pick the feel, palette, and soundtrack to anchor the night.",
-    meta: "Mood starter",
+    title: 'Define the vibe',
+    description: 'Pick the feel, palette, and soundtrack to anchor the night.',
+    meta: 'Mood starter',
   },
   {
-    title: "Build the lineup",
-    description: "Select pours, bites, and hosts that match the energy.",
-    meta: "Menu draft",
+    title: 'Build the lineup',
+    description: 'Select pours, bites, and hosts that match the energy.',
+    meta: 'Menu draft',
   },
   {
-    title: "Lock the moments",
-    description: "Shape arrival rituals, pacing, and the headline toast.",
-    meta: "Timeline",
+    title: 'Lock the moments',
+    description: 'Shape arrival rituals, pacing, and the headline toast.',
+    meta: 'Timeline',
   },
 ];
 
 const sessionDetails: SessionDetail[] = [
-  { label: "Location", value: "Downtown Loft" },
-  { label: "Date", value: "Oct 12 · 7:00 PM" },
-  { label: "Guests", value: "12–18" },
-  { label: "Budget", value: "$72 / guest" },
+  { label: 'Location', value: 'Downtown Loft' },
+  { label: 'Date', value: 'Oct 12 · 7:00 PM' },
+  { label: 'Guests', value: '12–18' },
+  { label: 'Budget', value: '$72 / guest' },
 ];
 
-const focusAreas = ["Staffing", "Inventory", "Storytelling cues"];
+const focusAreas = ['Staffing', 'Inventory', 'Storytelling cues'];
 
 function Header() {
   return (
@@ -71,11 +71,7 @@ function Header() {
 function FlowNavItem({ label, helper, isActive }: NavItem) {
   return (
     <li>
-      <button
-        type="button"
-        className="nav-item"
-        aria-current={isActive ? "page" : undefined}
-      >
+      <button type="button" className="nav-item" aria-current={isActive ? 'page' : undefined}>
         <span>{label}</span>
         <small>{helper}</small>
       </button>
@@ -106,8 +102,8 @@ function HeroSection() {
       <p className="hero-tag">Core flow workspace</p>
       <h1 id="hero-title">Craft a tasting journey that feels intentional.</h1>
       <p className="hero-copy">
-        This shell keeps your flow focused: define the vibe, shape the
-        experience, and confirm the final guest-ready run of show.
+        This shell keeps your flow focused: define the vibe, shape the experience, and confirm the
+        final guest-ready run of show.
       </p>
       <div className="hero-actions">
         <button className="primary" type="button">

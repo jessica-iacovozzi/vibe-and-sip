@@ -1,4 +1,4 @@
-import type { Cocktail, FilterCriteria } from "../models";
+import type { Cocktail, FilterCriteria } from '../models';
 
 const matchesSingle = (selectedId: string, itemId: string): boolean =>
   selectedId.length === 0 || selectedId === itemId;
@@ -7,12 +7,7 @@ const matchesMulti = (selectedIds: string[], itemIds: string[]): boolean =>
   selectedIds.length === 0 || selectedIds.some((id) => itemIds.includes(id));
 
 const normalizeCriteria = (criteria: FilterCriteria): Required<FilterCriteria> => {
-  const {
-    vibeIds = [],
-    occasionIds = [],
-    difficultyId = "",
-    alcoholLevelId = "",
-  } = criteria;
+  const { vibeIds = [], occasionIds = [], difficultyId = '', alcoholLevelId = '' } = criteria;
 
   return {
     vibeIds,
@@ -23,8 +18,7 @@ const normalizeCriteria = (criteria: FilterCriteria): Required<FilterCriteria> =
 };
 
 const isEmptyCriteria = (criteria: FilterCriteria): boolean => {
-  const { vibeIds, occasionIds, difficultyId, alcoholLevelId } =
-    normalizeCriteria(criteria);
+  const { vibeIds, occasionIds, difficultyId, alcoholLevelId } = normalizeCriteria(criteria);
 
   return (
     vibeIds.length === 0 &&
@@ -35,8 +29,7 @@ const isEmptyCriteria = (criteria: FilterCriteria): boolean => {
 };
 
 const matchesCriteria = (cocktail: Cocktail, criteria: FilterCriteria): boolean => {
-  const { vibeIds, occasionIds, difficultyId, alcoholLevelId } =
-    normalizeCriteria(criteria);
+  const { vibeIds, occasionIds, difficultyId, alcoholLevelId } = normalizeCriteria(criteria);
 
   if (!matchesSingle(difficultyId, cocktail.difficultyId)) {
     return false;
@@ -57,10 +50,7 @@ const matchesCriteria = (cocktail: Cocktail, criteria: FilterCriteria): boolean 
   return true;
 };
 
-const filterCocktails = (
-  cocktails: Cocktail[],
-  criteria: FilterCriteria = {},
-): Cocktail[] => {
+const filterCocktails = (cocktails: Cocktail[], criteria: FilterCriteria = {}): Cocktail[] => {
   if (cocktails.length === 0) {
     return [];
   }
