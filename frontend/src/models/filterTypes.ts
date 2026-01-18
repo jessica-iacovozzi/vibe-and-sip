@@ -8,3 +8,5 @@ export type FilterInput = {
   difficultyId?: SingleSelectId;
   alcoholLevelId?: SingleSelectId;
 };
+
+export type FilterCriteria = FilterInput;

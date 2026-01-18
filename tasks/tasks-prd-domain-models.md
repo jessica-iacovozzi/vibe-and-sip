@@ -31,10 +31,10 @@
   - [x] 2.3 Validate that IDs referenced in cocktails exist in the seed lists
   - [x] 2.4 Export seed data from a single index barrel
 - [ ] 3.0 Implement pure filtering utilities for basic filter combinations
-  - [ ] 3.1 Define a `FilterCriteria` type with optional difficulty/alcohol and multi-select arrays
-  - [ ] 3.2 Implement `filterCocktails` as a pure function using early returns and array helpers
-  - [ ] 3.3 Ensure filtering supports single difficulty/alcohol and multi-select vibes/occasions
-  - [ ] 3.4 Add a small helper to normalize empty/undefined filter inputs
+  - [x] 3.1 Define a `FilterCriteria` type with optional difficulty/alcohol and multi-select arrays
+  - [x] 3.2 Implement `filterCocktails` as a pure function using early returns and array helpers
+  - [x] 3.3 Ensure filtering supports single difficulty/alcohol and multi-select vibes/occasions
+  - [x] 3.4 Add a small helper to normalize empty/undefined filter inputs
 - [ ] 4.0 Add unit tests for model shapes and filtering behavior
   - [ ] 4.1 Add tests that validate each model has required fields
   - [ ] 4.2 Add tests for filtering by difficulty only, alcohol only, vibes only, occasions only
