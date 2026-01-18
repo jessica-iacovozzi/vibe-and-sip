@@ -1,15 +1,16 @@
 """Health check utilities for the API."""
 
-import os
 import socket
 from urllib.parse import urlparse
 
 from sqlalchemy import create_engine, text
 from sqlalchemy.exc import SQLAlchemyError
 
+from app.settings import get_settings
+
 
 def get_database_url() -> str | None:
-    return os.getenv("DATABASE_URL")
+    return get_settings().DATABASE_URL
 
 
 def run_database_probe(database_url: str) -> bool:
@@ -32,7 +33,8 @@ def check_database(database_url: str | None = None) -> bool:
 
 
 def get_cache_url() -> str | None:
-    return os.getenv("REDIS_URL") or os.getenv("CACHE_URL")
+    settings = get_settings()
+    return settings.REDIS_URL or settings.CACHE_URL
 
 
 def can_connect_to_cache(cache_url: str) -> bool:

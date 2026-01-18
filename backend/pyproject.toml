@@ -5,6 +5,9 @@ description = "FastAPI backend for Vibe & Sip"
 authors = ["Your Name <you@example.com>"]
 packages = [{ include = "app" }]
 
+[tool.poetry.scripts]
+seed = "app.seed:main"
+
 [tool.poetry.dependencies]
 python = "^3.11"
 fastapi = "^0.111.0"
@@ -13,6 +16,8 @@ pydantic = "^2.8.2"
 pydantic-settings = "^2.3.4"
 sqlalchemy = "^2.0.32"
 alembic = "^1.13.2"
+psycopg = { version = "^3.2.1", extras = ["binary"] }
+python-multipart = "^0.0.21"
 
 [tool.poetry.group.dev.dependencies]
 black = "^24.4.2"

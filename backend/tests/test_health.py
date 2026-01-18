@@ -3,7 +3,7 @@
 import pytest
 from fastapi.testclient import TestClient
 
-from app import health as health_module
+from app import main as main_module
 from app.main import app
 
 client = TestClient(app)
@@ -20,7 +20,7 @@ def test_health_degraded(monkeypatch: pytest.MonkeyPatch) -> None:
     def fake_dependency_statuses() -> dict[str, bool]:
         return {"database": False}
 
-    monkeypatch.setattr(health_module, "get_dependency_statuses", fake_dependency_statuses)
+    monkeypatch.setattr(main_module, "get_dependency_statuses", fake_dependency_statuses)
 
     response = client.get("/health")
 
