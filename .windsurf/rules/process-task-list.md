@@ -7,7 +7,7 @@ trigger: manual
 Guidelines for managing task lists in markdown files to track progress on completing a PRD
 
 ## Task Implementation
-- **One sub-task at a time:** Do **NOT** start the next sub‑task until you ask the user for permission and they say "yes"
+- **One task at a time:** Do **NOT** start the next parent task until you ask the user for permission and they say "yes"
 - **Completion protocol:**  
   1. When you finish a **sub‑task**, immediately mark it as completed by changing `[ ]` to `[x]`.
   2. Once all the subtasks are marked completed, mark the **parent task** as completed.
@@ -33,5 +33,5 @@ When working with task lists, the AI must:
    - Mark the **parent task** `[x]` once **all** its subtasks are `[x]`.
 3. Add newly discovered tasks.
 4. Keep "Relevant Files" accurate and up to date.
-5. Before starting work, check which sub‑task is next.
-6. After implementing a sub‑task, update the file and then pause for user approval.
+5. Before starting work, check which parent task is next.
+6. After implementing a parent task, update the file and then pause for user approval.
