@@ -47,7 +47,13 @@ def load_seed_data() -> SeedData:
 
 
 def parse_exported_array(seed_source: str, export_name: str) -> list[dict[str, Any]]:
-    bracket_start = seed_source.find("[", seed_source.find(f"export const {export_name}"))
+    export_index = seed_source.find(f"export const {export_name}")
+    if export_index == -1:
+        raise ValueError(f"Seed export not found: {export_name}")
+    assignment_index = seed_source.find("=", export_index)
+    if assignment_index == -1:
+        raise ValueError(f"Seed export missing assignment: {export_name}")
+    bracket_start = seed_source.find("[", assignment_index)
     if bracket_start == -1:
         raise ValueError(f"Seed export not found: {export_name}")
     bracket_end = find_matching_bracket(seed_source, bracket_start)
@@ -77,7 +83,8 @@ def normalize_ts_literal(value: str) -> str:
 
 
 def insert_seed_data(session: Session, seed_data: SeedData) -> None:
-    vibes = upsert_entities(session, Vibe, seed_data["vibes"])
+    vibes_payloads = [normalize_vibe_payload(payload) for payload in seed_data["vibes"]]
+    vibes = upsert_entities(session, Vibe, vibes_payloads)
     occasions = upsert_entities(session, Occasion, seed_data["occasions"])
     difficulties = upsert_entities(session, Difficulty, seed_data["difficulties"])
     alcohol_levels = upsert_entities(session, AlcoholLevel, seed_data["alcoholLevels"])
@@ -102,6 +109,15 @@ def upsert_entities(
                 setattr(entity, key, value)
         entities[payload["id"]] = entity
     return entities
+
+
+def normalize_vibe_payload(payload: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "id": payload["id"],
+        "name": payload["name"],
+        "description": payload["description"],
+        "icon": payload.get("imageUrl"),
+    }
 
 
 def insert_cocktails(

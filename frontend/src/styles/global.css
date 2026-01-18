@@ -201,6 +201,87 @@ a:focus-visible {
   gap: 28px;
 }
 
+.vibe-panel {
+  background: rgba(255, 255, 255, 0.82);
+  border-radius: var(--radius-lg);
+  padding: 24px;
+  box-shadow: var(--shadow-card);
+  backdrop-filter: blur(14px);
+  display: grid;
+  gap: 14px;
+}
+
+.vibe-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 14px;
+}
+
+.vibe-card {
+  width: 100%;
+  text-align: left;
+  padding: 16px;
+  border-radius: var(--radius-md);
+  background: white;
+  box-shadow: 0 10px 20px rgba(31, 27, 22, 0.08);
+  display: grid;
+  gap: 8px;
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+  border: 1px solid transparent;
+}
+
+.vibe-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 16px 28px rgba(31, 27, 22, 0.16);
+}
+
+.vibe-card:focus-visible {
+  border-color: rgba(210, 124, 91, 0.8);
+  box-shadow: 0 0 0 3px rgba(210, 124, 91, 0.22);
+  outline: none;
+}
+
+.vibe-icon {
+  width: 44px;
+  height: 44px;
+  border-radius: 14px;
+  background: rgba(210, 124, 91, 0.16);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  font-weight: 600;
+  color: var(--ink-700);
+}
+
+.vibe-name {
+  font-weight: 600;
+  font-size: 1rem;
+}
+
+.vibe-desc {
+  color: var(--ink-500);
+  font-size: 0.85rem;
+}
+
+.vibe-state {
+  border-radius: var(--radius-md);
+  background: rgba(255, 255, 255, 0.7);
+  padding: 16px;
+  color: var(--ink-700);
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+  align-items: flex-start;
+}
+
+.vibe-error {
+  border: 1px solid rgba(210, 124, 91, 0.35);
+  background: rgba(210, 124, 91, 0.12);
+}
+
 .hero {
   background: linear-gradient(120deg, rgba(60, 81, 61, 0.95), rgba(48, 70, 60, 0.92));
   color: #fdf9f4;
@@ -444,6 +525,10 @@ a:focus-visible {
 @media (min-width: 960px) {
   .main-grid {
     grid-template-columns: minmax(0, 1.3fr) minmax(0, 0.75fr);
+  }
+
+  .vibe-panel {
+    padding: 28px;
   }
 }
 

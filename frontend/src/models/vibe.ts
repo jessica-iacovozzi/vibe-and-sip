@@ -2,5 +2,6 @@ export type Vibe = {
   id: string;
   name: string;
   description: string;
-  icon?: string;
+  imageUrl?: string | null;
+  tags: string[];
 };

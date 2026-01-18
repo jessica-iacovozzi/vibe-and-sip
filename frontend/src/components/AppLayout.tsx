@@ -1,3 +1,6 @@
+import type { VibeResponse } from '../utils/api';
+import useVibes from '../utils/useVibes';
+
 type NavItem = {
   label: string;
   helper: string;
@@ -117,6 +120,71 @@ function HeroSection() {
   );
 }
 
+type VibeCardProps = {
+  vibe: VibeResponse;
+};
+
+function VibeCard({ vibe }: VibeCardProps) {
+  return (
+    <li>
+      <button type="button" className="vibe-card" aria-label={vibe.name}>
+        <span className="vibe-icon" aria-hidden="true">
+          {vibe.imageUrl ?? '⋯'}
+        </span>
+        <span className="vibe-name">{vibe.name}</span>
+        <span className="vibe-desc">{vibe.description}</span>
+      </button>
+    </li>
+  );
+}
+
+function VibeSelectionSection() {
+  const { vibes, isLoading, error, reload } = useVibes();
+
+  const hasError = error.length > 0;
+  const hasVibes = vibes.length > 0;
+
+  return (
+    <section className="vibe-panel" aria-labelledby="vibe-title">
+      <div className="panel-header">
+        <div>
+          <p className="panel-kicker">Vibe selection</p>
+          <h2 id="vibe-title">Choose the vibe</h2>
+        </div>
+        <span className="panel-pill">Step 1 · Drink pairing</span>
+      </div>
+      <p className="panel-subcopy">
+        Scan the available vibes and pick the mood you want to anchor the night.
+      </p>
+      {isLoading && (
+        <div className="vibe-state" role="status" aria-live="polite">
+          Loading vibes...
+        </div>
+      )}
+      {hasError && (
+        <div className="vibe-state vibe-error" role="alert">
+          <p>{error}</p>
+          <button className="secondary" type="button" onClick={() => reload()}>
+            Retry
+          </button>
+        </div>
+      )}
+      {!isLoading && !hasError && (
+        <ul className="vibe-grid" aria-label="Available vibes">
+          {vibes.map((vibe) => (
+            <VibeCard key={vibe.id} vibe={vibe} />
+          ))}
+        </ul>
+      )}
+      {!isLoading && !hasError && !hasVibes && (
+        <div className="vibe-state" role="status" aria-live="polite">
+          No vibes available right now.
+        </div>
+      )}
+    </section>
+  );
+}
+
 function FlowStepCard({ title, description, meta, index }: FlowStep & { index: number }) {
   return (
     <article className="flow-step" style={{ animationDelay: `${index * 0.08}s` }}>
@@ -219,6 +287,7 @@ function MainContent() {
   return (
     <main className="app-main" id="main-content">
       <HeroSection />
+      <VibeSelectionSection />
       <div className="main-grid">
         <FlowSteps />
         <SessionPanel />
