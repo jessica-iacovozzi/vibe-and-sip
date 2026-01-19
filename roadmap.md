@@ -17,11 +17,9 @@ Each row represents a standalone, independently buildable unit, sequenced from f
 | **M2**    | Data            | Domain Models                 | Define core domain entities for cocktails and filtering          | Cocktail, Vibe, Occasion, Difficulty, AlcoholLevel models | N/A | High |
 | **M2**    | Data            | Data Seeding Script           | Seed a curated cocktail catalog with exactly 3 cocktails per vibe| Seed script | N/A | High |
 | **M3**    | Vibe Selection  | Vibe List Retrieval           | Fetch available vibes for user selection                         | `GET /vibes` | Vibe card grid | High |
-| **M3**    | Vibe Selection  | Single Vibe Selection         | Enforce single active vibe per session                           | Request validation | Single-select UI state | High |
-| **M3**    | Filters         | Occasion Filter (Optional)    | Allow occasion input that influences results without blocking.   | Query param (non-blocking) | Toggle buttons | Medium |
+| **M3**    | Filters         | Occasion Filter               | Allow occasion input that influences results without blocking.   | Query param (non-blocking) | Toggle buttons | Medium |
 | **M3**    | Filters         | Difficulty Slider             | Accept difficulty input to adjust cocktail complexity            | Query param | Slider with labels (Lazy → Impress) | High |
 | **M3**    | Recommendations | Curated Cocktail Results      | Return exactly 3 cocktails matching vibe and filters             | `GET /cocktails?vibe=&difficulty=&occasion=` (limit enforced) | Results list (3 cards only) | High |
-| **M3**    | Recommendations | Fixed Result Limit            | Prevent more than 3 cocktails from being returned or displayed   | Hard limit in query logic | No pagination / infinite scroll | High |
 | **M3**    | Recipe          | Recipe Detail Endpoint        | Fetch full recipe data for a selected cocktail                   | `GET /cocktails/{id}` | N/A | High |
 | **M4**    | UI Flow         | Vibe Selection Screen         | Allow users to start the flow by selecting a vibe                | N/A | Vibe selection screen | High |
 | **M4**    | UI Flow         | Filter Controls               | Display optional occasion toggle and difficulty slider together  | N/A | Filter controls UI | High |
