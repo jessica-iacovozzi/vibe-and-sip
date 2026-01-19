@@ -1,3 +1,5 @@
+import { useState } from 'react';
+
 import type { VibeResponse } from '../utils/api';
 import useVibes from '../utils/useVibes';
 
@@ -122,12 +124,20 @@ function HeroSection() {
 
 type VibeCardProps = {
   vibe: VibeResponse;
+  isSelected: boolean;
+  onSelect: (vibeId: string) => void;
 };
 
-function VibeCard({ vibe }: VibeCardProps) {
+function VibeCard({ vibe, isSelected, onSelect }: VibeCardProps) {
   return (
     <li>
-      <button type="button" className="vibe-card" aria-label={vibe.name}>
+      <button
+        type="button"
+        className={`vibe-card${isSelected ? ' is-selected' : ''}`}
+        aria-pressed={isSelected}
+        aria-label={vibe.name}
+        onClick={() => onSelect(vibe.id)}
+      >
         <span className="vibe-icon" aria-hidden="true">
           {vibe.imageUrl ?? '⋯'}
         </span>
@@ -140,9 +150,17 @@ function VibeCard({ vibe }: VibeCardProps) {
 
 function VibeSelectionSection() {
   const { vibes, isLoading, error, reload } = useVibes();
+  const [selectedVibeId, setSelectedVibeId] = useState('');
+  const [isPairingReady, setIsPairingReady] = useState(false);
 
   const hasError = error.length > 0;
   const hasVibes = vibes.length > 0;
+  const selectedVibe = vibes.find((vibe) => vibe.id === selectedVibeId);
+
+  const handleVibeSelect = (vibeId: string) => {
+    setSelectedVibeId(vibeId);
+    setIsPairingReady(true);
+  };
 
   return (
     <section className="vibe-panel" aria-labelledby="vibe-title">
@@ -172,9 +190,25 @@ function VibeSelectionSection() {
       {!isLoading && !hasError && (
         <ul className="vibe-grid" aria-label="Available vibes">
           {vibes.map((vibe) => (
-            <VibeCard key={vibe.id} vibe={vibe} />
+            <VibeCard
+              key={vibe.id}
+              vibe={vibe}
+              isSelected={vibe.id === selectedVibeId}
+              onSelect={handleVibeSelect}
+            />
           ))}
         </ul>
+      )}
+      {isPairingReady && selectedVibe && (
+        <div className="vibe-flow" role="status" aria-live="polite">
+          <div>
+            <p className="vibe-flow-title">Drink pairing ready</p>
+            <p className="vibe-flow-copy">Selected vibe: {selectedVibe.name}</p>
+          </div>
+          <button className="primary" type="button">
+            Start drink pairing
+          </button>
+        </div>
       )}
       {!isLoading && !hasError && !hasVibes && (
         <div className="vibe-state" role="status" aria-live="polite">

@@ -10,6 +10,9 @@
 - `frontend/src/utils/api.ts` - Fetch helper for `GET /vibes` data retrieval.
 - `frontend/src/utils/useVibes.ts` - Hook for loading vibes with loading/error state.
 - `frontend/vite.config.ts` - Dev server proxy to forward API requests to the backend.
+- `frontend/src/components/AppLayout.test.tsx` - Frontend tests for vibe grid UI states.
+- `frontend/src/setupTests.ts` - Test setup for Jest DOM matchers.
+- `frontend/package.json` - Added frontend testing dependencies.
 - `frontend/src/styles/*` - Styling updates for the vibe grid, loading, and error states.
 - `tasks/tasks-prd-vibe-list-retrieval.md` - Task tracking for the vibe list retrieval work.
 
@@ -34,11 +37,11 @@
   - [x] 3.2 Implement card markup to show vibe name and image/icon.
   - [x] 3.3 Add accessible focus and selection styles for keyboard users.
   - [x] 3.4 Add loading skeleton/placeholder state and an error state with retry.
-- [ ] 4.0 Handle vibe selection to start drink pairing flow
-  - [ ] 4.1 Track the selected vibe in local state.
-  - [ ] 4.2 On selection, trigger the drink pairing flow entry point (route or UI transition).
-  - [ ] 4.3 Ensure only one vibe can be selected at a time.
-- [ ] 5.0 Add/adjust tests and seed data as needed
-  - [ ] 5.1 Verify backend seed data includes required vibe fields for the API response.
-  - [ ] 5.2 Add/update backend tests for the `GET /vibes` response shape.
-  - [ ] 5.3 Add/update frontend tests for the vibe grid states (loading, error, populated).
+- [x] 4.0 Handle vibe selection to start drink pairing flow
+  - [x] 4.1 Track the selected vibe in local state.
+  - [x] 4.2 On selection, trigger the drink pairing flow entry point (route or UI transition).
+  - [x] 4.3 Ensure only one vibe can be selected at a time.
+- [x] 5.0 Add/adjust tests and seed data as needed
+  - [x] 5.1 Verify backend seed data includes required vibe fields for the API response.
+  - [x] 5.2 Add/update backend tests for the `GET /vibes` response shape.
+  - [x] 5.3 Add/update frontend tests for the vibe grid states (loading, error, populated).
