@@ -40,8 +40,12 @@ def seed_cocktail(session_factory: sessionmaker) -> None:
             id="cocktail-test",
             name="Test Cocktail",
             description="Test description",
-            ingredients=["ice"],
+            image_url="test-image.jpg",
+            ingredients=[{"name": "Ice", "amount": "1", "unit": "cube"}],
             steps=["mix"],
+            glassware="Rocks glass",
+            garnish="Lime wheel",
+            tags={"spirit": ["gin"], "flavor": ["citrus"]},
             difficulty_id=difficulty.id,
             alcohol_level_id=alcohol.id,
             rank=1,
@@ -75,7 +79,7 @@ def test_list_cocktails_filtered(monkeypatch: pytest.MonkeyPatch) -> None:
             "id": "cocktail-test",
             "name": "Test Cocktail",
             "description": "Test description",
-            "imageUrl": None,
+            "imageUrl": "test-image.jpg",
         }
     ]
 
@@ -94,3 +98,38 @@ def test_list_cocktails_empty(monkeypatch: pytest.MonkeyPatch) -> None:
     payload = response.json()
     assert payload["items"] == []
     assert payload["total"] == 0
+
+
+def test_get_cocktail_detail_success(monkeypatch: pytest.MonkeyPatch) -> None:
+    session_factory = create_session_factory()
+    seed_cocktail(session_factory)
+    monkeypatch.setattr(main_module, "create_session", session_factory)
+
+    client = TestClient(app)
+    response = client.get("/cocktails/cocktail-test")
+
+    assert response.status_code == 200
+    payload = response.json()
+    assert payload == {
+        "id": "cocktail-test",
+        "name": "Test Cocktail",
+        "description": "Test description",
+        "imageUrl": "test-image.jpg",
+        "ingredients": [{"name": "Ice", "amount": "1", "unit": "cube"}],
+        "steps": ["mix"],
+        "glassware": "Rocks glass",
+        "garnish": "Lime wheel",
+        "tags": {"spirit": ["gin"], "flavor": ["citrus"]},
+    }
+
+
+def test_get_cocktail_detail_not_found(monkeypatch: pytest.MonkeyPatch) -> None:
+    session_factory = create_session_factory()
+    seed_cocktail(session_factory)
+    monkeypatch.setattr(main_module, "create_session", session_factory)
+
+    client = TestClient(app)
+    response = client.get("/cocktails/missing-cocktail")
+
+    assert response.status_code == 404
+    assert response.json() == {"detail": "Cocktail with id 'missing-cocktail' not found."}

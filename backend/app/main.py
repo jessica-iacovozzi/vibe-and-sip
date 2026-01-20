@@ -35,6 +35,25 @@ def serialize_cocktail(cocktail: Cocktail) -> dict[str, str | None]:
     }
 
 
+def serialize_cocktail_detail(cocktail: Cocktail) -> dict[str, object]:
+    """Return cocktail detail payload with ingredients, steps, and tag groups."""
+    tags = cocktail.tags or {}
+    return {
+        "id": cocktail.id,
+        "name": cocktail.name,
+        "description": cocktail.description,
+        "imageUrl": getattr(cocktail, "image_url", None),
+        "ingredients": cocktail.ingredients,
+        "steps": cocktail.steps,
+        "glassware": cocktail.glassware,
+        "garnish": cocktail.garnish,
+        "tags": {
+            "spirit": tags.get("spirit", []),
+            "flavor": tags.get("flavor", []),
+        },
+    }
+
+
 def resolve_page(value: int) -> int:
     return value if value > 0 else DEFAULT_PAGE
 
@@ -129,3 +148,19 @@ def list_cocktails(
         }
     except SQLAlchemyError as error:
         raise HTTPException(status_code=500, detail=f"Failed to load cocktails: {error}") from error
+
+
+@app.get("/cocktails/{cocktail_id}")
+def get_cocktail_detail(cocktail_id: str) -> dict[str, object]:
+    try:
+        with create_session() as session:
+            cocktail = session.get(Cocktail, cocktail_id)
+        if cocktail is None:
+            raise HTTPException(
+                status_code=404, detail=f"Cocktail with id '{cocktail_id}' not found."
+            )
+        return serialize_cocktail_detail(cocktail)
+    except SQLAlchemyError as error:
+        raise HTTPException(
+            status_code=500, detail=f"Failed to load cocktail detail: {error}"
+        ) from error

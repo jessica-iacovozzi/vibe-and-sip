@@ -143,8 +143,12 @@ def insert_cocktails(
 def apply_cocktail_fields(cocktail: Cocktail, payload: dict[str, Any]) -> None:
     cocktail.name = payload["name"]
     cocktail.description = payload["description"]
+    cocktail.image_url = payload.get("imageUrl")
     cocktail.ingredients = payload["ingredients"]
     cocktail.steps = payload["steps"]
+    cocktail.glassware = payload.get("glassware")
+    cocktail.garnish = payload.get("garnish")
+    cocktail.tags = payload.get("tags")
     cocktail.difficulty_id = payload["difficultyId"]
     cocktail.alcohol_level_id = payload["alcoholLevelId"]
 
