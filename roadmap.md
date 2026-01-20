@@ -19,8 +19,8 @@ Each row represents a standalone, independently buildable unit, sequenced from f
 | **M3**    | Vibe Selection  | Vibe List Retrieval           | Fetch available vibes for user selection                         | `GET /vibes` | Vibe card grid | High |
 | **M3**    | Filters         | Occasion Filter               | Allow occasion input that influences results without blocking.   | Query param (non-blocking) | Toggle buttons | Medium |
 | **M3**    | Filters         | Difficulty Slider             | Accept difficulty input to adjust cocktail complexity            | Query param | Slider with labels (Lazy → Impress) | High |
-| **M3**    | Recommendations | Curated Cocktail Results      | Return exactly 3 cocktails matching vibe and filters             | `GET /cocktails?vibe=&difficulty=&occasion=` (limit enforced) | Results list (3 cards only) | High |
-| **M3**    | Recipe          | Recipe Detail Endpoint        | Fetch full recipe data for a selected cocktail                   | `GET /cocktails/{id}` | N/A | High |
+| **M3**    | Recommendations | Curated Cocktail Results      | Return cocktails matching vibe and filters                      | `GET /cocktails?vibe=&difficulty=&occasion=`                 | Results list                | High |
+| **M3**    | Recipe          | Recipe Detail Endpoint        | Fetch full recipe data for a selected cocktail                   | `GET /cocktails/{id}` | Recipe detail view | High |
 | **M4**    | UI Flow         | Vibe Selection Screen         | Allow users to start the flow by selecting a vibe                | N/A | Vibe selection screen | High |
 | **M4**    | UI Flow         | Filter Controls               | Display optional occasion toggle and difficulty slider together  | N/A | Filter controls UI | High |
 | **M4**    | UI Flow         | Results View                  | Display 3 curated cocktails after selection                      | N/A | Results view (3 cards) | High |
