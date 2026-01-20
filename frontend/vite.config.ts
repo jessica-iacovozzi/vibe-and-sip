@@ -6,6 +6,7 @@ export default defineConfig({
   server: {
     proxy: {
       '/vibes': 'http://localhost:8000',
+      '/cocktails': 'http://localhost:8000',
     },
   },
   test: {

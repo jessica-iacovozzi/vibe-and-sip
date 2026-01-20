@@ -10,7 +10,13 @@ import {
   DIFFICULTY_URL_SYNC_ENABLED,
 } from '../domain/difficultyConfig';
 import rankVibesByOccasion from '../utils/rankVibesByOccasion';
-import { buildCocktailsUrl, type VibeResponse } from '../utils/api';
+import {
+  buildCocktailsUrl,
+  fetchCocktails,
+  type CocktailListItem,
+  type CocktailsResponse,
+  type VibeResponse,
+} from '../utils/api';
 import useVibes from '../utils/useVibes';
 
 type NavItem = {
@@ -39,7 +45,13 @@ type FilterQueryState = {
   vibeId: string;
   occasionId: string;
   difficultyId: string;
+  page: number;
 };
+
+const PLACEHOLDER_IMAGE =
+  'data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" width="160" height="120"><rect width="100%" height="100%" fill="%23efe7de"/><text x="50%" y="50%" dominant-baseline="middle" text-anchor="middle" fill="%23806c5b" font-size="12">Vibe & Sip</text></svg>';
+
+const RESULTS_LIMIT = 12;
 
 const navItems: NavItem[] = [
   { label: 'Discover', helper: 'Mood & guests', isActive: true },
@@ -90,7 +102,100 @@ const getDifficultyIndex = (difficultyId: string): number => {
 const getDifficultyIdFromIndex = (index: number): string =>
   DIFFICULTY_LEVELS[index]?.id ?? DEFAULT_DIFFICULTY_ID;
 
-const syncFilterQueryParams = ({ vibeId, occasionId, difficultyId }: FilterQueryState): void => {
+type CocktailResultListProps = {
+  cocktails: CocktailListItem[];
+  currentPage: number;
+  totalPages: number;
+  isLoading: boolean;
+  onPageChange: (page: number) => void;
+};
+
+function CocktailResultsList({
+  cocktails: cocktailItems,
+  currentPage,
+  totalPages,
+  isLoading,
+  onPageChange,
+}: CocktailResultListProps) {
+  const showPagination = totalPages > 1;
+
+  return (
+    <div className="results-panel" aria-live="polite">
+      <div className="panel-header">
+        <div>
+          <p className="panel-kicker">Curated results</p>
+          <h3>Recommended cocktails</h3>
+        </div>
+        <span className="panel-pill">Step 2 · Results</span>
+      </div>
+      <ul className="results-list" aria-label="Cocktail results">
+        {cocktailItems.map((cocktail) => (
+          <li key={cocktail.id} className="result-card">
+            <img
+              src={cocktail.imageUrl ?? PLACEHOLDER_IMAGE}
+              alt={cocktail.name}
+              loading="lazy"
+            />
+            <div>
+              <p className="result-title">{cocktail.name}</p>
+              <p className="result-desc">{cocktail.description}</p>
+            </div>
+          </li>
+        ))}
+      </ul>
+      {isLoading && (
+        <p className="results-loading" role="status" aria-live="polite">
+          Loading cocktails...
+        </p>
+      )}
+      {showPagination && (
+        <div className="results-pagination" role="navigation" aria-label="Results pages">
+          <button
+            className="secondary"
+            type="button"
+            onClick={() => onPageChange(Math.max(currentPage - 1, 1))}
+            disabled={currentPage <= 1}
+          >
+            Previous
+          </button>
+          <span className="results-page" aria-live="polite">
+            Page {currentPage} of {totalPages}
+          </span>
+          <button
+            className="secondary"
+            type="button"
+            onClick={() => onPageChange(Math.min(currentPage + 1, totalPages))}
+            disabled={currentPage >= totalPages}
+          >
+            Next
+          </button>
+        </div>
+      )}
+    </div>
+  );
+}
+
+type EmptyResultsStateProps = {
+  onClear: () => void;
+};
+
+function EmptyResultsState({ onClear }: EmptyResultsStateProps) {
+  return (
+    <div className="results-empty" role="status" aria-live="polite">
+      <p>No cocktails match those filters yet.</p>
+      <button className="secondary" type="button" onClick={onClear}>
+        Clear filters
+      </button>
+    </div>
+  );
+}
+
+const syncFilterQueryParams = ({
+  vibeId,
+  occasionId,
+  difficultyId,
+  page,
+}: FilterQueryState): void => {
   if (!DIFFICULTY_URL_SYNC_ENABLED) {
     return;
   }
@@ -109,6 +214,12 @@ const syncFilterQueryParams = ({ vibeId, occasionId, difficultyId }: FilterQuery
     params.set('occasion', occasionId);
   } else {
     params.delete('occasion');
+  }
+
+  if (page > 1) {
+    params.set('page', String(page));
+  } else {
+    params.delete('page');
   }
 
   window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
@@ -236,6 +347,10 @@ function VibeSelectionSection() {
   const [selectedVibeId, setSelectedVibeId] = useState('');
   const [isPairingReady, setIsPairingReady] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
+  const [cocktailResults, setCocktailResults] = useState<CocktailsResponse | null>(null);
+  const [isResultsLoading, setIsResultsLoading] = useState(false);
+  const [resultsError, setResultsError] = useState('');
+  const [resultsPage, setResultsPage] = useState(1);
   const hasMounted = useRef(false);
 
   const hasError = error.length > 0;
@@ -253,6 +368,11 @@ function VibeSelectionSection() {
     occasionId: selectedOccasionId,
     difficultyId: selectedDifficultyId,
   });
+  const resultItems = cocktailResults?.items ?? [];
+  const hasResults = resultItems.length > 0;
+  const totalPages = cocktailResults
+    ? Math.max(1, Math.ceil(cocktailResults.total / cocktailResults.limit))
+    : 0;
 
   const handleDifficultyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const nextIndex = Number(event.target.value);
@@ -262,6 +382,18 @@ function VibeSelectionSection() {
   const handleVibeSelect = (vibeId: string) => {
     setSelectedVibeId(vibeId);
     setIsPairingReady(true);
+  };
+
+  const handleClearFilters = () => {
+    setSelectedVibeId('');
+    setSelectedOccasionId('');
+    setSelectedDifficultyId(DEFAULT_DIFFICULTY_ID);
+    setIsPairingReady(false);
+    setResultsPage(1);
+  };
+
+  const handleResultsPageChange = (page: number) => {
+    setResultsPage(page);
   };
 
   useEffect(() => {
@@ -283,8 +415,48 @@ function VibeSelectionSection() {
       vibeId: selectedVibeId,
       occasionId: selectedOccasionId,
       difficultyId: selectedDifficultyId,
+      page: resultsPage,
     });
+  }, [selectedVibeId, selectedOccasionId, selectedDifficultyId, resultsPage]);
+
+  useEffect(() => {
+    setResultsPage(1);
   }, [selectedVibeId, selectedOccasionId, selectedDifficultyId]);
+
+  useEffect(() => {
+    if (selectedVibeId.length === 0) {
+      setCocktailResults(null);
+      setResultsError('');
+      setIsResultsLoading(false);
+      return () => {};
+    }
+
+    const controller = new AbortController();
+    setIsResultsLoading(true);
+    setResultsError('');
+
+    fetchCocktails({
+      vibeId: selectedVibeId,
+      occasionId: selectedOccasionId,
+      difficultyId: selectedDifficultyId,
+      page: resultsPage,
+      limit: RESULTS_LIMIT,
+      signal: controller.signal,
+    })
+      .then((response) => setCocktailResults(response))
+      .catch((fetchError) => {
+        if (fetchError instanceof Error && fetchError.name === 'AbortError') {
+          return;
+        }
+        setCocktailResults(null);
+        setResultsError(
+          fetchError instanceof Error ? fetchError.message : 'Failed to load cocktails.',
+        );
+      })
+      .finally(() => setIsResultsLoading(false));
+
+    return () => controller.abort();
+  }, [selectedVibeId, selectedOccasionId, selectedDifficultyId, resultsPage]);
 
   return (
     <section className="vibe-panel" aria-labelledby="vibe-title">
@@ -374,6 +546,26 @@ function VibeSelectionSection() {
             Start drink pairing
           </button>
         </div>
+      )}
+      {selectedVibeId.length > 0 && resultsError.length > 0 && (
+        <div className="results-empty" role="alert">
+          <p>{resultsError}</p>
+          <button className="secondary" type="button" onClick={handleClearFilters}>
+            Clear filters
+          </button>
+        </div>
+      )}
+      {selectedVibeId.length > 0 && hasResults && (
+        <CocktailResultsList
+          cocktails={resultItems}
+          currentPage={resultsPage}
+          totalPages={totalPages}
+          isLoading={isResultsLoading}
+          onPageChange={handleResultsPageChange}
+        />
+      )}
+      {selectedVibeId.length > 0 && !hasResults && !isResultsLoading && resultsError.length === 0 && (
+        <EmptyResultsState onClear={handleClearFilters} />
       )}
       {!isLoading && !hasError && !hasVibes && (
         <div className="vibe-state" role="status" aria-live="polite">

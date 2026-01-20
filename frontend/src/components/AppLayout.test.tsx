@@ -1,5 +1,5 @@
-import { fireEvent, render, screen } from '@testing-library/react';
-import { beforeEach, describe, expect, it, vi } from 'vitest';
+import { fireEvent, render, screen, waitFor } from '@testing-library/react';
+import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 
 import AppLayout from './AppLayout';
 import useVibes from '../utils/useVibes';
@@ -28,9 +28,135 @@ const sampleVibes = [
   },
 ];
 
+describe('AppLayout cocktail results', () => {
+  beforeEach(() => {
+    mockUseVibes.mockReset();
+    mockUseVibes.mockReturnValue(buildVibesState({ vibes: sampleVibes }));
+  });
+
+  it('renders the results list from the cocktails response', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          items: [
+            {
+              id: 'cocktail-test',
+              name: 'Test Cocktail',
+              description: 'Test description',
+              imageUrl: null,
+            },
+          ],
+          page: 1,
+          limit: 12,
+          total: 1,
+        }),
+      }),
+    );
+
+    render(<AppLayout />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Chill Night' }));
+
+    expect(await screen.findByText('Recommended cocktails')).toBeInTheDocument();
+    expect(await screen.findByText('Test Cocktail')).toBeInTheDocument();
+    expect(screen.getByText('Test description')).toBeInTheDocument();
+  });
+
+  it('shows the empty state and clears filters', async () => {
+    vi.stubGlobal(
+      'fetch',
+      vi.fn().mockResolvedValue({
+        ok: true,
+        json: async () => ({
+          items: [],
+          page: 1,
+          limit: 12,
+          total: 0,
+        }),
+      }),
+    );
+
+    render(<AppLayout />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Chill Night' }));
+
+    expect(await screen.findByText('No cocktails match those filters yet.')).toBeInTheDocument();
+    fireEvent.click(screen.getByRole('button', { name: 'Clear filters' }));
+
+    await waitFor(() => {
+      expect(screen.queryByText('No cocktails match those filters yet.')).not.toBeInTheDocument();
+    });
+  });
+
+  it('requests the next page of results when pagination is used', async () => {
+    const fetchMock = vi
+      .fn()
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          items: [
+            {
+              id: 'cocktail-test',
+              name: 'Test Cocktail',
+              description: 'Test description',
+              imageUrl: null,
+            },
+          ],
+          page: 1,
+          limit: 12,
+          total: 24,
+        }),
+      })
+      .mockResolvedValueOnce({
+        ok: true,
+        json: async () => ({
+          items: [
+            {
+              id: 'cocktail-test-2',
+              name: 'Test Cocktail 2',
+              description: 'Another description',
+              imageUrl: null,
+            },
+          ],
+          page: 2,
+          limit: 12,
+          total: 24,
+        }),
+      });
+
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(<AppLayout />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Chill Night' }));
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith(
+        '/cocktails?vibe=vibe-chill&difficulty=difficulty-balanced&page=1&limit=12',
+        expect.objectContaining({ signal: expect.any(AbortSignal) }),
+      );
+    });
+
+    fireEvent.click(await screen.findByRole('button', { name: 'Next' }));
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalledWith(
+        '/cocktails?vibe=vibe-chill&difficulty=difficulty-balanced&page=2&limit=12',
+        expect.objectContaining({ signal: expect.any(AbortSignal) }),
+      );
+    });
+  });
+});
+
 vi.mock('../utils/useVibes', () => ({
   default: vi.fn(),
 }));
+
+afterEach(() => {
+  vi.restoreAllMocks();
+});
 
 describe('AppLayout occasion filter', () => {
   beforeEach(() => {

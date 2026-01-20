@@ -8,6 +8,20 @@ export type VibeResponse = {
   tags: string[];
 };
 
+export type CocktailListItem = {
+  id: string;
+  name: string;
+  description: string;
+  imageUrl?: string | null;
+};
+
+export type CocktailsResponse = {
+  items: CocktailListItem[];
+  page: number;
+  limit: number;
+  total: number;
+};
+
 type FetchVibesParams = {
   signal?: AbortSignal;
   occasionId?: string;
@@ -17,6 +31,9 @@ type CocktailsQueryParams = {
   vibeId?: string;
   difficultyId?: string;
   occasionId?: string;
+  page?: number;
+  limit?: number;
+  signal?: AbortSignal;
 };
 
 const buildVibesUrl = (occasionId = ''): string => {
@@ -32,6 +49,8 @@ export const buildCocktailsUrl = ({
   vibeId = '',
   difficultyId = DEFAULT_DIFFICULTY_ID,
   occasionId = '',
+  page = 1,
+  limit = 12,
 }: CocktailsQueryParams = {}): string => {
   const params = new URLSearchParams();
   const resolvedDifficulty = difficultyId.length > 0 ? difficultyId : DEFAULT_DIFFICULTY_ID;
@@ -45,7 +64,23 @@ export const buildCocktailsUrl = ({
   }
 
   params.set(DIFFICULTY_QUERY_PARAM, resolvedDifficulty);
+  params.set('page', String(page));
+  params.set('limit', String(limit));
   return `/cocktails?${params.toString()}`;
+};
+
+export const fetchCocktails = async ({
+  signal,
+  ...query
+}: CocktailsQueryParams = {}): Promise<CocktailsResponse> => {
+  const response = await fetch(buildCocktailsUrl(query), { signal });
+
+  if (!response.ok) {
+    const message = await response.text();
+    throw new Error(`Failed to fetch cocktails: ${message || response.statusText}`);
+  }
+
+  return (await response.json()) as CocktailsResponse;
 };
 
 export const fetchVibes = async (

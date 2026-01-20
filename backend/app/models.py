@@ -69,6 +69,7 @@ class Cocktail(Base):
     id = Column(String, primary_key=True)
     name = Column(String, nullable=False)
     description = Column(String, nullable=False)
+    rank = Column(Integer, nullable=False, default=0)
     ingredients = Column(JSON, nullable=False)
     steps = Column(JSON, nullable=False)
     difficulty_id = Column(String, ForeignKey("difficulties.id"), nullable=False)
