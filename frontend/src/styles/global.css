@@ -229,6 +229,76 @@ a:focus-visible {
   gap: 10px;
 }
 
+.difficulty-filter {
+  display: grid;
+  gap: 10px;
+  padding: 12px 14px;
+  border-radius: 16px;
+  background: rgba(255, 255, 255, 0.7);
+  border: 1px solid rgba(92, 83, 75, 0.12);
+}
+
+.difficulty-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 12px;
+}
+
+.difficulty-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--ink-500);
+}
+
+.difficulty-value {
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink-700);
+  background: rgba(210, 124, 91, 0.14);
+  padding: 4px 10px;
+  border-radius: 999px;
+}
+
+.difficulty-slider {
+  width: 100%;
+  accent-color: var(--clay-500);
+}
+
+.difficulty-steps {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  align-items: center;
+  font-size: 0.75rem;
+  color: var(--ink-500);
+}
+
+.difficulty-step {
+  justify-self: center;
+  padding: 2px 6px;
+  border-radius: 999px;
+}
+
+.difficulty-step:first-child {
+  justify-self: start;
+}
+
+.difficulty-step:last-child {
+  justify-self: end;
+}
+
+.difficulty-step.is-active {
+  color: var(--ink-900);
+  background: rgba(60, 81, 61, 0.12);
+  font-weight: 600;
+}
+
+.difficulty-helper {
+  font-size: 0.8rem;
+  color: var(--ink-500);
+}
+
 .occasion-note {
   font-size: 0.85rem;
   color: var(--ink-500);

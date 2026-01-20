@@ -2,8 +2,15 @@ import { useEffect, useRef, useState } from 'react';
 
 import { cocktails } from '../data';
 import { occasionOptions } from '../domain/occasionOptions';
+import {
+  DEFAULT_DIFFICULTY_ID,
+  DIFFICULTY_LEVELS,
+  DIFFICULTY_HELPER_TEXT,
+  DIFFICULTY_QUERY_PARAM,
+  DIFFICULTY_URL_SYNC_ENABLED,
+} from '../domain/difficultyConfig';
 import rankVibesByOccasion from '../utils/rankVibesByOccasion';
-import type { VibeResponse } from '../utils/api';
+import { buildCocktailsUrl, type VibeResponse } from '../utils/api';
 import useVibes from '../utils/useVibes';
 
 type NavItem = {
@@ -26,6 +33,12 @@ type SessionDetail = {
 type OccasionToggleGroupProps = {
   selectedId: string;
   onSelect: (occasionId: string) => void;
+};
+
+type FilterQueryState = {
+  vibeId: string;
+  occasionId: string;
+  difficultyId: string;
 };
 
 const navItems: NavItem[] = [
@@ -61,6 +74,45 @@ const sessionDetails: SessionDetail[] = [
 ];
 
 const focusAreas = ['Staffing', 'Inventory', 'Storytelling cues'];
+
+const getInitialDifficulty = (): string => {
+  const params = new URLSearchParams(window.location.search);
+  return params.get(DIFFICULTY_QUERY_PARAM) ?? DEFAULT_DIFFICULTY_ID;
+};
+
+const getDifficultyIndex = (difficultyId: string): number => {
+  const resolvedId = difficultyId.length > 0 ? difficultyId : DEFAULT_DIFFICULTY_ID;
+  const index = DIFFICULTY_LEVELS.findIndex((level) => level.id === resolvedId);
+
+  return index >= 0 ? index : 1;
+};
+
+const getDifficultyIdFromIndex = (index: number): string =>
+  DIFFICULTY_LEVELS[index]?.id ?? DEFAULT_DIFFICULTY_ID;
+
+const syncFilterQueryParams = ({ vibeId, occasionId, difficultyId }: FilterQueryState): void => {
+  if (!DIFFICULTY_URL_SYNC_ENABLED) {
+    return;
+  }
+
+  const params = new URLSearchParams(window.location.search);
+  const resolvedDifficulty = difficultyId.length > 0 ? difficultyId : DEFAULT_DIFFICULTY_ID;
+
+  params.set(DIFFICULTY_QUERY_PARAM, resolvedDifficulty);
+  if (vibeId.length > 0) {
+    params.set('vibe', vibeId);
+  } else {
+    params.delete('vibe');
+  }
+
+  if (occasionId.length > 0) {
+    params.set('occasion', occasionId);
+  } else {
+    params.delete('occasion');
+  }
+
+  window.history.replaceState(null, '', `${window.location.pathname}?${params.toString()}`);
+};
 
 function Header() {
   return (
@@ -179,6 +231,7 @@ function VibeCard({ vibe, isSelected, onSelect }: VibeCardProps) {
 
 function VibeSelectionSection() {
   const [selectedOccasionId, setSelectedOccasionId] = useState('');
+  const [selectedDifficultyId, setSelectedDifficultyId] = useState(getInitialDifficulty);
   const { vibes, isLoading, error, reload } = useVibes({ occasionId: selectedOccasionId });
   const [selectedVibeId, setSelectedVibeId] = useState('');
   const [isPairingReady, setIsPairingReady] = useState(false);
@@ -193,6 +246,18 @@ function VibeSelectionSection() {
   const hasOccasionMatch =
     selectedOccasionId.length === 0 ||
     cocktails.some((cocktail) => cocktail.occasionIds.includes(selectedOccasionId));
+  const difficultyIndex = getDifficultyIndex(selectedDifficultyId);
+  const difficultyLabel = DIFFICULTY_LEVELS[difficultyIndex]?.label ?? 'Balanced';
+  const cocktailRequestUrl = buildCocktailsUrl({
+    vibeId: selectedVibeId,
+    occasionId: selectedOccasionId,
+    difficultyId: selectedDifficultyId,
+  });
+
+  const handleDifficultyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const nextIndex = Number(event.target.value);
+    setSelectedDifficultyId(getDifficultyIdFromIndex(nextIndex));
+  };
 
   const handleVibeSelect = (vibeId: string) => {
     setSelectedVibeId(vibeId);
@@ -209,6 +274,18 @@ function VibeSelectionSection() {
     window.setTimeout(() => setIsTransitioning(false), 180);
   }, [selectedOccasionId]);
 
+  useEffect(() => {
+    setSelectedDifficultyId(getInitialDifficulty());
+  }, []);
+
+  useEffect(() => {
+    syncFilterQueryParams({
+      vibeId: selectedVibeId,
+      occasionId: selectedOccasionId,
+      difficultyId: selectedDifficultyId,
+    });
+  }, [selectedVibeId, selectedOccasionId, selectedDifficultyId]);
+
   return (
     <section className="vibe-panel" aria-labelledby="vibe-title">
       <div className="panel-header">
@@ -222,6 +299,38 @@ function VibeSelectionSection() {
         Scan the available vibes and pick the mood you want to anchor the night.
       </p>
       <OccasionToggleGroup selectedId={selectedOccasionId} onSelect={setSelectedOccasionId} />
+      <div className="difficulty-filter">
+        <div className="difficulty-header">
+          <p className="difficulty-label">Difficulty</p>
+          <span className="difficulty-value" aria-live="polite">
+            {difficultyLabel}
+          </span>
+        </div>
+        <input
+          className="difficulty-slider"
+          type="range"
+          min={0}
+          max={DIFFICULTY_LEVELS.length - 1}
+          step={1}
+          value={difficultyIndex}
+          onChange={handleDifficultyChange}
+          aria-label="Difficulty"
+          aria-valuetext={difficultyLabel}
+        />
+        <div className="difficulty-steps" aria-hidden="true">
+          {DIFFICULTY_LEVELS.map((level, index) => (
+            <span
+              key={level.id}
+              className={`difficulty-step${index === difficultyIndex ? ' is-active' : ''}`}
+            >
+              {level.label}
+            </span>
+          ))}
+        </div>
+        <p className="difficulty-helper" role="note">
+          {DIFFICULTY_HELPER_TEXT}
+        </p>
+      </div>
       {!hasOccasionMatch && (
         <p className="occasion-note" role="status" aria-live="polite">
           No direct matches for that occasion yet. Showing the full list instead.
@@ -261,7 +370,7 @@ function VibeSelectionSection() {
             <p className="vibe-flow-title">Drink pairing ready</p>
             <p className="vibe-flow-copy">Selected vibe: {selectedVibe.name}</p>
           </div>
-          <button className="primary" type="button">
+          <button className="primary" type="button" data-request-url={cocktailRequestUrl}>
             Start drink pairing
           </button>
         </div>

@@ -18,6 +18,16 @@ const buildVibesState = (overrides: VibeOverrides = {}): UseVibesResponse => ({
   ...overrides,
 });
 
+const sampleVibes = [
+  {
+    id: 'vibe-chill',
+    name: 'Chill Night',
+    description: 'Low-key, relaxed, and cozy drinks for winding down.',
+    imageUrl: 'moon',
+    tags: ['cozy'],
+  },
+];
+
 vi.mock('../utils/useVibes', () => ({
   default: vi.fn(),
 }));
@@ -109,5 +119,42 @@ describe('AppLayout vibe grid states', () => {
     expect(
       screen.getByText('Low-key, relaxed, and cozy drinks for winding down.'),
     ).toBeInTheDocument();
+  });
+});
+
+describe('AppLayout difficulty slider', () => {
+  beforeEach(() => {
+    mockUseVibes.mockReset();
+    window.history.replaceState(null, '', '/');
+  });
+
+  it('defaults to Balanced and includes difficulty in the request URL', () => {
+    mockUseVibes.mockReturnValue(buildVibesState({ vibes: sampleVibes }));
+
+    render(<AppLayout />);
+
+    expect(screen.getByText('Balanced', { selector: '.difficulty-value' })).toBeInTheDocument();
+    expect(screen.getByLabelText('Difficulty')).toHaveValue('1');
+
+    fireEvent.click(screen.getByRole('button', { name: 'Chill Night' }));
+
+    const actionButton = screen.getByRole('button', { name: 'Start drink pairing' });
+    expect(actionButton).toHaveAttribute('data-request-url', expect.stringContaining('difficulty='));
+  });
+
+  it('updates the label and request URL when the slider changes', () => {
+    mockUseVibes.mockReturnValue(buildVibesState({ vibes: sampleVibes }));
+
+    render(<AppLayout />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Chill Night' }));
+    fireEvent.change(screen.getByLabelText('Difficulty'), { target: { value: '2' } });
+
+    expect(screen.getByText('Impress', { selector: '.difficulty-value' })).toBeInTheDocument();
+    const actionButton = screen.getByRole('button', { name: 'Start drink pairing' });
+    expect(actionButton).toHaveAttribute(
+      'data-request-url',
+      expect.stringContaining('difficulty=difficulty-impress'),
+    );
   });
 });

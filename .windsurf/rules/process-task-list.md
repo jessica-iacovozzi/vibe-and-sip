@@ -11,7 +11,7 @@ Guidelines for managing task lists in markdown files to track progress on comple
 - **Completion protocol:**  
   1. When you finish a **sub‑task**, immediately mark it as completed by changing `[ ]` to `[x]`.
   2. Once all the subtasks are marked completed, mark the **parent task** as completed.
-- Stop after each sub‑task and wait for the user's go‑ahead.
+- Stop after each parent task and wait for the user's go‑ahead.
 
 ## Task List Maintenance
 

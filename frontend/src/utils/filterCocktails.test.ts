@@ -10,7 +10,23 @@ describe('filterCocktails', () => {
       difficultyId: 'difficulty-lazy',
     });
 
-    expect(getIds(results)).toEqual(['cocktail-midnight-spritz', 'cocktail-party-paloma']);
+    expect(getIds(results)).toEqual([]);
+  });
+
+  it('filters by balanced difficulty range', () => {
+    const results = filterCocktails(cocktails, {
+      difficultyId: 'difficulty-balanced',
+    });
+
+    expect(getIds(results)).toEqual(getIds(cocktails));
+  });
+
+  it('filters by impress difficulty range', () => {
+    const results = filterCocktails(cocktails, {
+      difficultyId: 'difficulty-impress',
+    });
+
+    expect(getIds(results)).toEqual([]);
   });
 
   it('filters by alcohol level only', () => {
@@ -41,7 +57,7 @@ describe('filterCocktails', () => {
     const results = filterCocktails(cocktails, {
       vibeIds: ['vibe-date'],
       occasionIds: ['occasion-couple'],
-      difficultyId: 'difficulty-moderate',
+      difficultyId: 'difficulty-balanced',
       alcoholLevelId: 'alcohol-strong',
     });
 

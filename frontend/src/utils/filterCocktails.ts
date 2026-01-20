@@ -1,4 +1,6 @@
+import { DIFFICULTY_LEVELS } from '../domain/difficultyConfig';
 import type { Cocktail, FilterCriteria } from '../models';
+import { computeComplexityScore, isScoreWithinRange } from './complexity';
 
 const matchesSingle = (selectedId: string, itemId: string): boolean =>
   selectedId.length === 0 || selectedId === itemId;
@@ -7,10 +9,17 @@ const matchesMulti = (selectedIds: string[], itemIds: string[]): boolean =>
   selectedIds.length === 0 || selectedIds.some((id) => itemIds.includes(id));
 
 const normalizeCriteria = (criteria: FilterCriteria): Required<FilterCriteria> => {
-  const { vibeIds = [], occasionIds = [], difficultyId = '', alcoholLevelId = '' } = criteria;
+  const {
+    vibeIds = [],
+    occasionId = '',
+    occasionIds = [],
+    difficultyId = '',
+    alcoholLevelId = '',
+  } = criteria;
 
   return {
     vibeIds,
+    occasionId,
     occasionIds,
     difficultyId,
     alcoholLevelId,
@@ -31,8 +40,17 @@ const isEmptyCriteria = (criteria: FilterCriteria): boolean => {
 const matchesCriteria = (cocktail: Cocktail, criteria: FilterCriteria): boolean => {
   const { vibeIds, occasionIds, difficultyId, alcoholLevelId } = normalizeCriteria(criteria);
 
-  if (!matchesSingle(difficultyId, cocktail.difficultyId)) {
-    return false;
+  if (difficultyId.length > 0) {
+    const difficulty = DIFFICULTY_LEVELS.find((level) => level.id === difficultyId);
+
+    if (!difficulty) {
+      return false;
+    }
+
+    const complexityScore = computeComplexityScore(cocktail);
+    if (!isScoreWithinRange(complexityScore, difficulty.range)) {
+      return false;
+    }
   }
 
   if (!matchesSingle(alcoholLevelId, cocktail.alcoholLevelId)) {

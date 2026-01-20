@@ -63,8 +63,8 @@ export const difficulties: Difficulty[] = [
     rank: 1,
   },
   {
-    id: 'difficulty-moderate',
-    label: 'Moderate',
+    id: 'difficulty-balanced',
+    label: 'Balanced',
     rank: 2,
   },
   {
@@ -118,7 +118,7 @@ export const cocktails: Cocktail[] = [
       'Stir until chilled and strain into a rocks glass.',
       'Express orange peel oils and drop in.',
     ],
-    difficultyId: 'difficulty-moderate',
+    difficultyId: 'difficulty-balanced',
     alcoholLevelId: 'alcohol-strong',
     vibeIds: ['vibe-date', 'vibe-fancy-easy'],
     occasionIds: ['occasion-couple', 'occasion-hosting-friends'],
@@ -163,7 +163,7 @@ export const cocktails: Cocktail[] = [
       'Pour in whiskey and top with hot water.',
       'Garnish with cinnamon.',
     ],
-    difficultyId: 'difficulty-moderate',
+    difficultyId: 'difficulty-balanced',
     alcoholLevelId: 'alcohol-medium',
     vibeIds: ['vibe-cozy', 'vibe-chill'],
     occasionIds: ['occasion-solo'],
