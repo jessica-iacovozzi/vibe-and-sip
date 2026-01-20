@@ -12,6 +12,10 @@ type UseVibesResponse = VibeState & {
   reload: () => Promise<void>;
 };
 
+type UseVibesParams = {
+  occasionId?: string;
+};
+
 const defaultState: VibeState = {
   vibes: [],
   isLoading: true,
@@ -26,19 +30,19 @@ const getErrorMessage = (error: unknown): string => {
   return 'Failed to fetch vibes.';
 };
 
-const useVibes = (): UseVibesResponse => {
+const useVibes = ({ occasionId = '' }: UseVibesParams = {}): UseVibesResponse => {
   const [state, setState] = useState<VibeState>(defaultState);
 
   const loadVibes = useCallback(async () => {
     setState((prevState) => ({ ...prevState, isLoading: true, error: '' }));
 
     try {
-      const { vibes } = await fetchVibes();
+      const { vibes } = await fetchVibes({ occasionId });
       setState({ vibes, isLoading: false, error: '' });
     } catch (error) {
       setState({ vibes: [], isLoading: false, error: getErrorMessage(error) });
     }
-  }, []);
+  }, [occasionId]);
 
   useEffect(() => {
     loadVibes().catch(() => {});

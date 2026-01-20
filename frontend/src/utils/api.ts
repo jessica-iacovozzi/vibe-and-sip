@@ -8,12 +8,22 @@ export type VibeResponse = {
 
 type FetchVibesParams = {
   signal?: AbortSignal;
+  occasionId?: string;
+};
+
+const buildVibesUrl = (occasionId = ''): string => {
+  if (occasionId.length === 0) {
+    return '/vibes';
+  }
+
+  const params = new URLSearchParams({ occasion: occasionId });
+  return `/vibes?${params.toString()}`;
 };
 
 export const fetchVibes = async (
-  { signal }: FetchVibesParams = {},
+  { signal, occasionId }: FetchVibesParams = {},
 ): Promise<{ vibes: VibeResponse[] }> => {
-  const response = await fetch('/vibes', { signal });
+  const response = await fetch(buildVibesUrl(occasionId), { signal });
 
   if (!response.ok) {
     const message = await response.text();

@@ -211,10 +211,68 @@ a:focus-visible {
   gap: 14px;
 }
 
+.occasion-filter {
+  display: grid;
+  gap: 10px;
+}
+
+.occasion-label {
+  font-size: 0.75rem;
+  text-transform: uppercase;
+  letter-spacing: 0.18em;
+  color: var(--ink-500);
+}
+
+.occasion-toggle {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+}
+
+.occasion-note {
+  font-size: 0.85rem;
+  color: var(--ink-500);
+  background: rgba(92, 83, 75, 0.08);
+  padding: 10px 14px;
+  border-radius: 14px;
+}
+
+.occasion-chip {
+  padding: 8px 16px;
+  border-radius: 999px;
+  border: 1px solid rgba(92, 83, 75, 0.2);
+  background: rgba(255, 255, 255, 0.8);
+  font-size: 0.85rem;
+  font-weight: 600;
+  color: var(--ink-700);
+  transition:
+    transform 0.2s ease,
+    box-shadow 0.2s ease,
+    border-color 0.2s ease;
+}
+
+.occasion-chip:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 10px 18px rgba(31, 27, 22, 0.12);
+}
+
+.occasion-chip.is-active {
+  border-color: rgba(60, 81, 61, 0.6);
+  background: rgba(60, 81, 61, 0.12);
+  color: var(--ink-900);
+}
+
 .vibe-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
   gap: 14px;
+  transition: opacity 0.2s ease, transform 0.2s ease;
+  will-change: opacity, transform;
+}
+
+.vibe-grid.is-fading {
+  opacity: 0.5;
+  transform: translateY(6px);
 }
 
 .vibe-card {

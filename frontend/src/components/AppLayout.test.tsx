@@ -1,4 +1,4 @@
-import { render, screen } from '@testing-library/react';
+import { fireEvent, render, screen } from '@testing-library/react';
 import { beforeEach, describe, expect, it, vi } from 'vitest';
 
 import AppLayout from './AppLayout';
@@ -21,6 +21,44 @@ const buildVibesState = (overrides: VibeOverrides = {}): UseVibesResponse => ({
 vi.mock('../utils/useVibes', () => ({
   default: vi.fn(),
 }));
+
+describe('AppLayout occasion filter', () => {
+  beforeEach(() => {
+    mockUseVibes.mockReset();
+  });
+
+  it('toggles the occasion selection and allows resetting to All', () => {
+    mockUseVibes.mockReturnValue(buildVibesState());
+
+    render(<AppLayout />);
+
+    const allButton = screen.getByRole('button', { name: 'All' });
+    const coupleButton = screen.getByRole('button', { name: 'Couple' });
+
+    expect(allButton).toHaveAttribute('aria-pressed', 'true');
+    expect(coupleButton).toHaveAttribute('aria-pressed', 'false');
+
+    fireEvent.click(coupleButton);
+
+    expect(allButton).toHaveAttribute('aria-pressed', 'false');
+    expect(coupleButton).toHaveAttribute('aria-pressed', 'true');
+
+    fireEvent.click(allButton);
+
+    expect(allButton).toHaveAttribute('aria-pressed', 'true');
+    expect(coupleButton).toHaveAttribute('aria-pressed', 'false');
+  });
+
+  it('exposes accessible toggle group semantics', () => {
+    mockUseVibes.mockReturnValue(buildVibesState());
+
+    render(<AppLayout />);
+
+    expect(screen.getByRole('group', { name: 'Occasion filter' })).toBeInTheDocument();
+    expect(screen.getByRole('button', { name: 'All' })).toHaveAttribute('aria-pressed');
+    expect(screen.getByRole('button', { name: 'Solo' })).toHaveAttribute('aria-pressed');
+  });
+});
 
 describe('AppLayout vibe grid states', () => {
   beforeEach(() => {

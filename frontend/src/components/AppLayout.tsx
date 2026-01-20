@@ -1,5 +1,8 @@
-import { useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 
+import { cocktails } from '../data';
+import { occasionOptions } from '../domain/occasionOptions';
+import rankVibesByOccasion from '../utils/rankVibesByOccasion';
 import type { VibeResponse } from '../utils/api';
 import useVibes from '../utils/useVibes';
 
@@ -18,6 +21,11 @@ type FlowStep = {
 type SessionDetail = {
   label: string;
   value: string;
+};
+
+type OccasionToggleGroupProps = {
+  selectedId: string;
+  onSelect: (occasionId: string) => void;
 };
 
 const navItems: NavItem[] = [
@@ -70,6 +78,27 @@ function Header() {
         Session in progress
       </div>
     </header>
+  );
+}
+
+function OccasionToggleGroup({ selectedId, onSelect }: OccasionToggleGroupProps) {
+  return (
+    <div className="occasion-filter">
+      <p className="occasion-label">Occasion</p>
+      <div className="occasion-toggle" role="group" aria-label="Occasion filter">
+        {occasionOptions.map((option) => (
+          <button
+            key={option.id || 'occasion-all'}
+            type="button"
+            className={`occasion-chip${option.id === selectedId ? ' is-active' : ''}`}
+            aria-pressed={option.id === selectedId}
+            onClick={() => onSelect(option.id)}
+          >
+            {option.label}
+          </button>
+        ))}
+      </div>
+    </div>
   );
 }
 
@@ -149,18 +178,36 @@ function VibeCard({ vibe, isSelected, onSelect }: VibeCardProps) {
 }
 
 function VibeSelectionSection() {
-  const { vibes, isLoading, error, reload } = useVibes();
+  const [selectedOccasionId, setSelectedOccasionId] = useState('');
+  const { vibes, isLoading, error, reload } = useVibes({ occasionId: selectedOccasionId });
   const [selectedVibeId, setSelectedVibeId] = useState('');
   const [isPairingReady, setIsPairingReady] = useState(false);
+  const [isTransitioning, setIsTransitioning] = useState(false);
+  const hasMounted = useRef(false);
 
   const hasError = error.length > 0;
-  const hasVibes = vibes.length > 0;
-  const selectedVibe = vibes.find((vibe) => vibe.id === selectedVibeId);
+  const rankedVibes = rankVibesByOccasion(vibes, selectedOccasionId);
+  const hasVibes = rankedVibes.length > 0;
+  const selectedVibe = rankedVibes.find((vibe) => vibe.id === selectedVibeId);
+  const showLoading = isLoading && !hasVibes && !hasError;
+  const hasOccasionMatch =
+    selectedOccasionId.length === 0 ||
+    cocktails.some((cocktail) => cocktail.occasionIds.includes(selectedOccasionId));
 
   const handleVibeSelect = (vibeId: string) => {
     setSelectedVibeId(vibeId);
     setIsPairingReady(true);
   };
+
+  useEffect(() => {
+    if (!hasMounted.current) {
+      hasMounted.current = true;
+      return;
+    }
+
+    setIsTransitioning(true);
+    window.setTimeout(() => setIsTransitioning(false), 180);
+  }, [selectedOccasionId]);
 
   return (
     <section className="vibe-panel" aria-labelledby="vibe-title">
@@ -174,7 +221,13 @@ function VibeSelectionSection() {
       <p className="panel-subcopy">
         Scan the available vibes and pick the mood you want to anchor the night.
       </p>
-      {isLoading && (
+      <OccasionToggleGroup selectedId={selectedOccasionId} onSelect={setSelectedOccasionId} />
+      {!hasOccasionMatch && (
+        <p className="occasion-note" role="status" aria-live="polite">
+          No direct matches for that occasion yet. Showing the full list instead.
+        </p>
+      )}
+      {showLoading && (
         <div className="vibe-state" role="status" aria-live="polite">
           Loading vibes...
         </div>
@@ -187,9 +240,12 @@ function VibeSelectionSection() {
           </button>
         </div>
       )}
-      {!isLoading && !hasError && (
-        <ul className="vibe-grid" aria-label="Available vibes">
-          {vibes.map((vibe) => (
+      {!hasError && (
+        <ul
+          className={`vibe-grid${isTransitioning ? ' is-fading' : ''}`}
+          aria-label="Available vibes"
+        >
+          {rankedVibes.map((vibe) => (
             <VibeCard
               key={vibe.id}
               vibe={vibe}
