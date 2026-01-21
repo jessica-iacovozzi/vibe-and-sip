@@ -58,10 +58,37 @@ describe('AppLayout cocktail results', () => {
     render(<AppLayout />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Chill Night' }));
+    fireEvent.click(screen.getByRole('button', { name: 'See drinks' }));
 
     expect(await screen.findByText('Recommended cocktails')).toBeInTheDocument();
     expect(await screen.findByText('Test Cocktail')).toBeInTheDocument();
     expect(screen.getByText('Test description')).toBeInTheDocument();
+  });
+
+  it('waits to fetch cocktails until the CTA is clicked', async () => {
+    const fetchMock = vi.fn().mockResolvedValue({
+      ok: true,
+      json: async () => ({
+        items: [],
+        page: 1,
+        limit: 12,
+        total: 0,
+      }),
+    });
+
+    vi.stubGlobal('fetch', fetchMock);
+
+    render(<AppLayout />);
+
+    fireEvent.click(screen.getByRole('button', { name: 'Chill Night' }));
+
+    expect(fetchMock).not.toHaveBeenCalled();
+
+    fireEvent.click(screen.getByRole('button', { name: 'See drinks' }));
+
+    await waitFor(() => {
+      expect(fetchMock).toHaveBeenCalled();
+    });
   });
 
   it('shows the empty state and clears filters', async () => {
@@ -81,6 +108,7 @@ describe('AppLayout cocktail results', () => {
     render(<AppLayout />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Chill Night' }));
+    fireEvent.click(screen.getByRole('button', { name: 'See drinks' }));
 
     expect(await screen.findByText('No cocktails match those filters yet.')).toBeInTheDocument();
     fireEvent.click(screen.getByRole('button', { name: 'Clear filters' }));
@@ -131,6 +159,7 @@ describe('AppLayout cocktail results', () => {
     render(<AppLayout />);
 
     fireEvent.click(screen.getByRole('button', { name: 'Chill Night' }));
+    fireEvent.click(screen.getByRole('button', { name: 'See drinks' }));
 
     await waitFor(() => {
       expect(fetchMock).toHaveBeenCalledWith(
@@ -246,6 +275,18 @@ describe('AppLayout vibe grid states', () => {
       screen.getByText('Low-key, relaxed, and cozy drinks for winding down.'),
     ).toBeInTheDocument();
   });
+
+  it('shows the CTA with an accessible label after selecting a vibe', () => {
+    mockUseVibes.mockReturnValue(buildVibesState({ vibes: sampleVibes }));
+
+    render(<AppLayout />);
+
+    expect(screen.queryByRole('button', { name: 'See drinks' })).not.toBeInTheDocument();
+
+    fireEvent.click(screen.getByRole('button', { name: 'Chill Night' }));
+
+    expect(screen.getByRole('button', { name: 'See drinks' })).toBeInTheDocument();
+  });
 });
 
 describe('AppLayout difficulty slider', () => {
@@ -264,7 +305,7 @@ describe('AppLayout difficulty slider', () => {
 
     fireEvent.click(screen.getByRole('button', { name: 'Chill Night' }));
 
-    const actionButton = screen.getByRole('button', { name: 'Start drink pairing' });
+    const actionButton = screen.getByRole('button', { name: 'See drinks' });
     expect(actionButton).toHaveAttribute('data-request-url', expect.stringContaining('difficulty='));
   });
 
@@ -277,7 +318,7 @@ describe('AppLayout difficulty slider', () => {
     fireEvent.change(screen.getByLabelText('Difficulty'), { target: { value: '2' } });
 
     expect(screen.getByText('Impress', { selector: '.difficulty-value' })).toBeInTheDocument();
-    const actionButton = screen.getByRole('button', { name: 'Start drink pairing' });
+    const actionButton = screen.getByRole('button', { name: 'See drinks' });
     expect(actionButton).toHaveAttribute(
       'data-request-url',
       expect.stringContaining('difficulty=difficulty-impress'),

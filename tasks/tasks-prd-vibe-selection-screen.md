@@ -14,24 +14,28 @@
 
 ## Tasks
 
-- [ ] 1.0 Review existing vibe flow UI and data sources
-  - [ ] 1.1 Inspect `AppLayout` for current vibe selection and flow entry behavior.
-  - [ ] 1.2 Confirm vibe data is sourced from seed data or API responses.
-  - [ ] 1.3 Verify current CTA label aligns with PRD (“See drinks”).
-- [ ] 2.0 Define/confirm vibe selection screen structure and state handling
-  - [ ] 2.1 Document the desired selection state (single selection, required before CTA).
-  - [ ] 2.2 Identify the next screen/route for the flow after selection.
-  - [ ] 2.3 Ensure selection is stored in app state and passed forward.
-- [ ] 3.0 Implement vibe selection UI (cards, selection state, CTA)
-  - [ ] 3.1 Render vibe cards with name, description, and icon.
-  - [ ] 3.2 Add selection styling and `aria-pressed` state to cards.
-  - [ ] 3.3 Disable CTA until a vibe is selected; enable once selected.
-  - [ ] 3.4 Update CTA label to “See drinks” per PRD.
-- [ ] 4.0 Ensure accessibility and UI consistency with existing styles
-  - [ ] 4.1 Validate keyboard navigation across cards and CTA.
-  - [ ] 4.2 Ensure ARIA labels for vibe cards and CTA.
-  - [ ] 4.3 Confirm layout responsiveness for mobile and desktop.
-- [ ] 5.0 Add/adjust tests for vibe selection screen behavior
-  - [ ] 5.1 Add tests for single selection and CTA enable/disable behavior.
-  - [ ] 5.2 Add tests for accessible labels and selected state.
-  - [ ] 5.3 Update any snapshot or UI tests impacted by label changes.
+- [x] 1.0 Review existing vibe flow UI and data sources
+  - [x] 1.1 Inspect `AppLayout` for current vibe selection and flow entry behavior.
+  - [x] 1.2 Confirm vibe data is sourced from seed data or API responses.
+  - [x] 1.3 Verify current CTA label aligns with PRD (“See drinks”).
+- [x] 2.0 Define/confirm vibe selection screen structure and state handling
+  - [x] 2.1 Document the desired selection state (single selection, required before CTA).
+  - [x] 2.2 Identify the next screen/route for the flow after selection.
+  - [x] 2.3 Ensure selection is stored in app state and passed forward.
+- [x] 3.0 Implement vibe selection UI (cards, selection state, CTA)
+  - [x] 3.1 Render vibe cards with name, description, and icon.
+  - [x] 3.2 Add selection styling and `aria-pressed` state to cards.
+  - [x] 3.3 Disable CTA until a vibe is selected; enable once selected.
+  - [x] 3.4 Update CTA label to “See drinks” per PRD.
+- [x] 4.0 Ensure accessibility and UI consistency with existing styles
+  - [x] 4.1 Validate keyboard navigation across cards and CTA.
+  - [x] 4.2 Ensure ARIA labels for vibe cards and CTA.
+  - [x] 4.3 Confirm layout responsiveness for mobile and desktop.
+- [x] 5.0 Add/adjust tests for vibe selection screen behavior
+  - [x] 5.1 Add tests for single selection and CTA enable/disable behavior.
+  - [x] 5.2 Add tests for accessible labels and selected state.
+  - [x] 5.3 Update any snapshot or UI tests impacted by label changes.
+- [x] 6.0 Gate cocktail results behind CTA click
+  - [x] 6.1 Track a confirmed vibe selection only after CTA click.
+  - [x] 6.2 Trigger cocktail fetches from confirmed selection only.
+  - [x] 6.3 Update tests to require CTA click before results.

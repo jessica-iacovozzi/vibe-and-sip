@@ -345,6 +345,7 @@ function VibeSelectionSection() {
   const [selectedDifficultyId, setSelectedDifficultyId] = useState(getInitialDifficulty);
   const { vibes, isLoading, error, reload } = useVibes({ occasionId: selectedOccasionId });
   const [selectedVibeId, setSelectedVibeId] = useState('');
+  const [confirmedVibeId, setConfirmedVibeId] = useState('');
   const [isPairingReady, setIsPairingReady] = useState(false);
   const [isTransitioning, setIsTransitioning] = useState(false);
   const [cocktailResults, setCocktailResults] = useState<CocktailsResponse | null>(null);
@@ -352,6 +353,7 @@ function VibeSelectionSection() {
   const [resultsError, setResultsError] = useState('');
   const [resultsPage, setResultsPage] = useState(1);
   const hasMounted = useRef(false);
+  const lastCocktailRequestKey = useRef('');
 
   const hasError = error.length > 0;
   const rankedVibes = rankVibesByOccasion(vibes, selectedOccasionId);
@@ -381,11 +383,25 @@ function VibeSelectionSection() {
 
   const handleVibeSelect = (vibeId: string) => {
     setSelectedVibeId(vibeId);
+    setConfirmedVibeId('');
     setIsPairingReady(true);
+    setCocktailResults(null);
+    setResultsError('');
+    setIsResultsLoading(false);
+    setResultsPage(1);
+  };
+
+  const handleSeeDrinks = () => {
+    if (selectedVibeId.length === 0) {
+      return;
+    }
+
+    setConfirmedVibeId(selectedVibeId);
   };
 
   const handleClearFilters = () => {
     setSelectedVibeId('');
+    setConfirmedVibeId('');
     setSelectedOccasionId('');
     setSelectedDifficultyId(DEFAULT_DIFFICULTY_ID);
     setIsPairingReady(false);
@@ -420,23 +436,32 @@ function VibeSelectionSection() {
   }, [selectedVibeId, selectedOccasionId, selectedDifficultyId, resultsPage]);
 
   useEffect(() => {
-    setResultsPage(1);
-  }, [selectedVibeId, selectedOccasionId, selectedDifficultyId]);
-
-  useEffect(() => {
-    if (selectedVibeId.length === 0) {
+    if (confirmedVibeId.length === 0) {
       setCocktailResults(null);
       setResultsError('');
       setIsResultsLoading(false);
+      lastCocktailRequestKey.current = '';
       return () => {};
     }
 
+    const requestKey = [
+      confirmedVibeId,
+      selectedOccasionId,
+      selectedDifficultyId,
+      String(resultsPage),
+    ].join('|');
+
+    if (lastCocktailRequestKey.current === requestKey) {
+      return () => {};
+    }
+
+    lastCocktailRequestKey.current = requestKey;
     const controller = new AbortController();
     setIsResultsLoading(true);
     setResultsError('');
 
     fetchCocktails({
-      vibeId: selectedVibeId,
+      vibeId: confirmedVibeId,
       occasionId: selectedOccasionId,
       difficultyId: selectedDifficultyId,
       page: resultsPage,
@@ -456,7 +481,7 @@ function VibeSelectionSection() {
       .finally(() => setIsResultsLoading(false));
 
     return () => controller.abort();
-  }, [selectedVibeId, selectedOccasionId, selectedDifficultyId, resultsPage]);
+  }, [confirmedVibeId, selectedOccasionId, selectedDifficultyId, resultsPage]);
 
   return (
     <section className="vibe-panel" aria-labelledby="vibe-title">
@@ -542,12 +567,18 @@ function VibeSelectionSection() {
             <p className="vibe-flow-title">Drink pairing ready</p>
             <p className="vibe-flow-copy">Selected vibe: {selectedVibe.name}</p>
           </div>
-          <button className="primary" type="button" data-request-url={cocktailRequestUrl}>
-            Start drink pairing
+          <button
+            className="primary"
+            type="button"
+            data-request-url={cocktailRequestUrl}
+            aria-label="See drinks"
+            onClick={handleSeeDrinks}
+          >
+            See drinks
           </button>
         </div>
       )}
-      {selectedVibeId.length > 0 && resultsError.length > 0 && (
+      {confirmedVibeId.length > 0 && resultsError.length > 0 && (
         <div className="results-empty" role="alert">
           <p>{resultsError}</p>
           <button className="secondary" type="button" onClick={handleClearFilters}>
@@ -555,7 +586,7 @@ function VibeSelectionSection() {
           </button>
         </div>
       )}
-      {selectedVibeId.length > 0 && hasResults && (
+      {confirmedVibeId.length > 0 && hasResults && (
         <CocktailResultsList
           cocktails={resultItems}
           currentPage={resultsPage}
@@ -564,7 +595,7 @@ function VibeSelectionSection() {
           onPageChange={handleResultsPageChange}
         />
       )}
-      {selectedVibeId.length > 0 && !hasResults && !isResultsLoading && resultsError.length === 0 && (
+      {confirmedVibeId.length > 0 && !hasResults && !isResultsLoading && resultsError.length === 0 && (
         <EmptyResultsState onClear={handleClearFilters} />
       )}
       {!isLoading && !hasError && !hasVibes && (

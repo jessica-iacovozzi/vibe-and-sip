@@ -40,6 +40,33 @@ function expectStringArray({ value, field }: ArrayCheck): void {
   value.forEach((entry) => expectNonEmptyString({ value: entry, field: `${field} item` }));
 }
 
+type IngredientCheck = {
+  value: unknown;
+  field: string;
+};
+
+function expectIngredientArray({ value, field }: IngredientCheck): void {
+  expect(Array.isArray(value), `${field} should be an array`).toBe(true);
+
+  if (!Array.isArray(value)) {
+    return;
+  }
+
+  value.forEach((entry) => {
+    expect(typeof entry, `${field} item should be an object`).toBe('object');
+
+    if (!entry || typeof entry !== 'object') {
+      return;
+    }
+
+    const ingredient = entry as { name?: unknown; amount?: unknown; unit?: unknown };
+
+    expectNonEmptyString({ value: ingredient.name, field: `${field} name` });
+    expectNonEmptyString({ value: ingredient.amount, field: `${field} amount` });
+    expectNonEmptyString({ value: ingredient.unit, field: `${field} unit` });
+  });
+}
+
 type NumberCheck = {
   value: unknown;
   field: string;
@@ -61,7 +88,7 @@ describe('model seed shapes', () => {
       expectNonEmptyString({ value: vibe.id, field: 'vibe.id' });
       expectNonEmptyString({ value: vibe.name, field: 'vibe.name' });
       expectNonEmptyString({ value: vibe.description, field: 'vibe.description' });
-      expectOptionalString({ value: vibe.icon, field: 'vibe.icon' });
+      expectOptionalString({ value: vibe.imageUrl, field: 'vibe.imageUrl' });
     });
   });
 
@@ -94,7 +121,7 @@ describe('model seed shapes', () => {
       expectNonEmptyString({ value: cocktail.id, field: 'cocktail.id' });
       expectNonEmptyString({ value: cocktail.name, field: 'cocktail.name' });
       expectNonEmptyString({ value: cocktail.description, field: 'cocktail.description' });
-      expectStringArray({ value: cocktail.ingredients, field: 'ingredients' });
+      expectIngredientArray({ value: cocktail.ingredients, field: 'ingredients' });
       expectStringArray({ value: cocktail.steps, field: 'steps' });
       expectOptionalString({ value: cocktail.imageUrl, field: 'cocktail.imageUrl' });
       expectNonEmptyString({ value: cocktail.difficultyId, field: 'cocktail.difficultyId' });

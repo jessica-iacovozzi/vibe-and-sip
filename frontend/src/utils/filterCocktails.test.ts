@@ -61,7 +61,7 @@ describe('filterCocktails', () => {
       alcoholLevelId: 'alcohol-strong',
     });
 
-    expect(getIds(results)).toEqual(['cocktail-citrus-negroni']);
+    expect(getIds(results)).toEqual(['cocktail-citrus-negroni', 'cocktail-velvet-espresso']);
   });
 
   it('returns all cocktails for empty filters', () => {
