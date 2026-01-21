@@ -22,11 +22,7 @@ Each row represents a standalone, independently buildable unit, sequenced from f
 | **M3**    | Recommendations | Curated Cocktail Results      | Return cocktails matching vibe and filters                      | `GET /cocktails?vibe=&difficulty=&occasion=`                 | Results list                | High |
 | **M3**    | Recipe          | Recipe Detail Endpoint        | Fetch full recipe data for a selected cocktail                   | `GET /cocktails/{id}` | Recipe detail view | High |
 | **M4**    | UI Flow         | Vibe Selection Screen         | Allow users to start the flow by selecting a vibe                | N/A | Vibe selection screen | High |
-| **M4**    | UI Flow         | Filter Controls               | Display optional occasion toggle and difficulty slider together  | N/A | Filter controls UI | High |
-| **M4**    | UI Flow         | Results View                  | Display 3 curated cocktails after selection                      | N/A | Results view (3 cards) | High |
 | **M4**    | Recipe View     | Recipe Detail View            | Display ingredients, ratios, and 3–5 preparation steps           | N/A | Recipe screen | High |
-| **M4**    | Recipe View     | Ingredient List Display       | Show ingredient list for a cocktail                              | Data field exposure | Ingredient list UI | High |
-| **M4**    | Recipe View     | Step-by-Step Instructions     | Present concise preparation steps (max 5)                        | Data field exposure | Bullet step UI | High |
 | **M5**    | Analytics       | Vibe Selected Event           | Track when a user selects a vibe                                 | Event emission | Event trigger | Medium |
 | **M5**    | Analytics       | Recipe Opened Event           | Track when a recipe detail is opened                             | Event emission | Event trigger | Medium |
 | **M5**    | Performance     | Speed-to-Decision Optimization| Ensure user can reach a decision in under 60 seconds             | API response performance | UI latency & flow tuning | Medium |
