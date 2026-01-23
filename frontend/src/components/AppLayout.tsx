@@ -18,6 +18,8 @@ import {
   type VibeResponse,
 } from '../utils/api';
 import useVibes from '../utils/useVibes';
+import type { Ingredient } from '../models/cocktail';
+import RecipeDetailModal from './RecipeDetailModal';
 
 type NavItem = {
   label: string;
@@ -102,12 +104,20 @@ const getDifficultyIndex = (difficultyId: string): number => {
 const getDifficultyIdFromIndex = (index: number): string =>
   DIFFICULTY_LEVELS[index]?.id ?? DEFAULT_DIFFICULTY_ID;
 
+const formatIngredientAmount = (ingredient: Ingredient): string =>
+  [ingredient.amount, ingredient.unit].filter(Boolean).join(' ');
+
 type CocktailResultListProps = {
   cocktails: CocktailListItem[];
   currentPage: number;
   totalPages: number;
   isLoading: boolean;
   onPageChange: (page: number) => void;
+  onSelectCocktail: (cocktailId: string) => void;
+};
+
+type IngredientRowProps = {
+  ingredient: Ingredient;
 };
 
 function CocktailResultsList({
@@ -116,6 +126,7 @@ function CocktailResultsList({
   totalPages,
   isLoading,
   onPageChange,
+  onSelectCocktail,
 }: CocktailResultListProps) {
   const showPagination = totalPages > 1;
 
@@ -131,15 +142,22 @@ function CocktailResultsList({
       <ul className="results-list" aria-label="Cocktail results">
         {cocktailItems.map((cocktail) => (
           <li key={cocktail.id} className="result-card">
-            <img
-              src={cocktail.imageUrl ?? PLACEHOLDER_IMAGE}
-              alt={cocktail.name}
-              loading="lazy"
-            />
-            <div>
-              <p className="result-title">{cocktail.name}</p>
-              <p className="result-desc">{cocktail.description}</p>
-            </div>
+            <button
+              className="result-card-button"
+              type="button"
+              onClick={() => onSelectCocktail(cocktail.id)}
+              aria-label={`View ${cocktail.name} recipe`}
+            >
+              <img
+                src={cocktail.imageUrl ?? PLACEHOLDER_IMAGE}
+                alt={cocktail.name}
+                loading="lazy"
+              />
+              <div>
+                <p className="result-title">{cocktail.name}</p>
+                <p className="result-desc">{cocktail.description}</p>
+              </div>
+            </button>
           </li>
         ))}
       </ul>
@@ -172,6 +190,18 @@ function CocktailResultsList({
         </div>
       )}
     </div>
+  );
+}
+
+function IngredientRow({ ingredient }: IngredientRowProps) {
+  const amount = formatIngredientAmount(ingredient);
+
+  return (
+    <li className="recipe-ingredient">
+      {amount.length > 0 && <span className="recipe-ingredient-amount">{amount} </span>}
+
+      <span>{ingredient.name}</span>
+    </li>
   );
 }
 
@@ -352,6 +382,8 @@ function VibeSelectionSection() {
   const [isResultsLoading, setIsResultsLoading] = useState(false);
   const [resultsError, setResultsError] = useState('');
   const [resultsPage, setResultsPage] = useState(1);
+  const [selectedCocktailId, setSelectedCocktailId] = useState('');
+  const [isRecipeModalOpen, setIsRecipeModalOpen] = useState(false);
   const hasMounted = useRef(false);
   const lastCocktailRequestKey = useRef('');
 
@@ -375,6 +407,9 @@ function VibeSelectionSection() {
   const totalPages = cocktailResults
     ? Math.max(1, Math.ceil(cocktailResults.total / cocktailResults.limit))
     : 0;
+  const selectedCocktail = cocktails.find((cocktail) => cocktail.id === selectedCocktailId);
+  const ingredientItems = selectedCocktail?.ingredients.filter((ingredient) => ingredient.name);
+  const stepItems = selectedCocktail?.steps.filter(Boolean);
 
   const handleDifficultyChange = (event: React.ChangeEvent<HTMLInputElement>) => {
     const nextIndex = Number(event.target.value);
@@ -410,6 +445,16 @@ function VibeSelectionSection() {
 
   const handleResultsPageChange = (page: number) => {
     setResultsPage(page);
+  };
+
+  const handleRecipeOpen = (cocktailId: string) => {
+    setSelectedCocktailId(cocktailId);
+    setIsRecipeModalOpen(true);
+  };
+
+  const handleRecipeClose = () => {
+    setIsRecipeModalOpen(false);
+    setSelectedCocktailId('');
   };
 
   useEffect(() => {
@@ -593,8 +638,58 @@ function VibeSelectionSection() {
           totalPages={totalPages}
           isLoading={isResultsLoading}
           onPageChange={handleResultsPageChange}
+          onSelectCocktail={handleRecipeOpen}
         />
       )}
+      <RecipeDetailModal
+        isOpen={isRecipeModalOpen && Boolean(selectedCocktail)}
+        title={selectedCocktail?.name ?? 'Recipe'}
+        onClose={handleRecipeClose}
+      >
+        {selectedCocktail && (
+          <div className="recipe-detail">
+            {ingredientItems && ingredientItems.length > 0 && (
+              <section className="recipe-section" aria-label="Ingredients">
+                <h3>Ingredients</h3>
+                <ul className="recipe-ingredient-list">
+                  {ingredientItems.map((ingredient) => (
+                    <IngredientRow key={ingredient.name} ingredient={ingredient} />
+                  ))}
+                </ul>
+              </section>
+            )}
+            {stepItems && stepItems.length > 0 && (
+              <section className="recipe-section" aria-label="Preparation steps">
+                <h3>Preparation</h3>
+                <ol className="recipe-steps">
+                  {stepItems.map((step) => (
+                    <li key={step}>{step}</li>
+                  ))}
+                </ol>
+              </section>
+            )}
+            {(selectedCocktail.glassware || selectedCocktail.garnish) && (
+              <section className="recipe-section" aria-label="Serving details">
+                <h3>Serve</h3>
+                <ul className="recipe-serve-list">
+                  {selectedCocktail.glassware && (
+                    <li>
+                      <span className="recipe-serve-label">Glassware</span>
+                      <span>{selectedCocktail.glassware}</span>
+                    </li>
+                  )}
+                  {selectedCocktail.garnish && (
+                    <li>
+                      <span className="recipe-serve-label">Garnish</span>
+                      <span>{selectedCocktail.garnish}</span>
+                    </li>
+                  )}
+                </ul>
+              </section>
+            )}
+          </div>
+        )}
+      </RecipeDetailModal>
       {confirmedVibeId.length > 0 && !hasResults && !isResultsLoading && resultsError.length === 0 && (
         <EmptyResultsState onClear={handleClearFilters} />
       )}
